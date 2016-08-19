@@ -1,6 +1,6 @@
 package com.easynetwork.weather.view;
 
-import com.easynetwork.common.util.log.Log;
+import com.easynetwork.weather.tools.Log;
 
 import android.content.Context;
 import android.graphics.Color;

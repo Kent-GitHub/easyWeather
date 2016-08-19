@@ -1,23 +1,20 @@
 package com.easynetwork.weather.core;
 
-import java.util.ArrayList;
-
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.easynetwork.common.util.log.Log;
-import com.easynetwork.common.util.network.NetworkUtil;
+import com.easynetwork.weather.tools.Log;
+import com.easynetwork.weather.tools.network.NetworkUtil;
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
-import com.easynetwork.weather.bean.EasyWeatherWrapper;
 import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.tools.MyLocationListener;
 import com.easynetwork.weather.tools.StatusBarUtils;
 import com.easynetwork.weather.tools.TextSpeakControl;
 import com.easynetwork.weather.tools.ToastUtil;
 import com.easynetwork.weather.tools.ViewUtil;
-import com.easynetwork.common.util.network.Network;
+import com.easynetwork.weather.tools.network.Network;
 import com.easynetwork.weather.bean.SimpleWeatherData;
 import com.easynetwork.weather.bean.User;
 import com.easynetwork.weather.core.menu.menu_left.MenuLeft;
@@ -32,13 +29,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import me.tangke.slidemenu.SlideMenu;
 
@@ -426,7 +422,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     }
 
     public void setStatusBarColor(int color) {
-        android.util.Log.e(TAG, "setStatusBarColor: " + color);
         StatusBarUtils.setWindowStatusBarColor(this, color);
     }
 
@@ -474,12 +469,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
     @Override
     protected void onStop() {
-
         super.onStop();
-        try {
+        if (ttsControl != null && ttsControl.isSpeak()) {
             ttsControl.stopSpeak();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -501,7 +493,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         if (log2file) {
             Log.close();
         }
-
+        if (ttsControl != null) {
+            ttsControl.closeTts();
+        }
     }
 
     @Override
@@ -535,10 +529,11 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
             mMenuRight.getFocus();
-        }
-        if (keyCode == KeyEvent.KEYCODE_MENU) {
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
             openSlideMenu(true);
             return true;
+        } else if (keyCode == KeyEvent.KEYCODE_BACK && ttsControl != null && ttsControl.isSpeak()) {
+            ttsControl.stopSpeak();
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -546,7 +541,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private boolean ttsOn = false;
 
     public void setTtsOn(boolean ttsOn) {
-        android.util.Log.e(TAG, "setTtsOn: " + ttsOn);
         this.ttsOn = ttsOn;
     }
 
@@ -557,6 +551,12 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
     @Override
     public void onReceiveLocation(BDLocation bdLocation) {
+        int locType = bdLocation.getLocType();
+        if (locType != 61 && locType != 66 && locType != 161) {
+            Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
+            hideTipsView();
+            return;
+        }
         isLocated = true;
         double latitude = bdLocation.getLatitude();
         double longitude = bdLocation.getLongitude();
@@ -586,4 +586,5 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         //nWeatherManager.requestData(true);
         nWeatherManager.requestData(city.getLatitude(), city.getLongitude());
     }
+
 }

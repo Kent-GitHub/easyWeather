@@ -1,10 +1,10 @@
-package com.easynetwork.common.util.storage;
+package com.easynetwork.weather.tools;
 
 import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
 
-import com.easynetwork.common.util.log.Log;
+import com.easynetwork.weather.tools.Log;
 
 import java.io.Closeable;
 import java.io.File;

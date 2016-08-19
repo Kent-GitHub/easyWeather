@@ -1,4 +1,4 @@
-package com.easynetwork.common.util.screen;
+package com.easynetwork.weather.tools;
 
 import android.app.Activity;
 import android.content.Context;

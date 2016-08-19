@@ -99,8 +99,6 @@ public class SimpleWeatherView extends LinearLayout {
         String location = weatherData.nUser.city;
         DailyWeatherData today = weatherData.getToday();
         NowWeatherData now = weatherData.getNowWeatherData();
-        Log.e(TAG, "setWeatherData: " + today.toString());
-        Log.e(TAG, "setWeatherData: " + location + now.toString());
         Date date = new Date();
         Calendar c = Calendar.getInstance();
         StringBuilder dateString = new StringBuilder();

@@ -1,11 +1,9 @@
-package com.easynetwork.common.util.log;
+package com.easynetwork.weather.tools;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-
-import com.easynetwork.common.util.storage.StorageUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.easynetwork.common.util.network;
+package com.easynetwork.weather.tools.network;
 
 
 /**

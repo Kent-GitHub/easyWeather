@@ -4,12 +4,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.easynetwork.common.util.log.Log;
-import com.easynetwork.common.util.storage.StorageUtil;
-import com.easynetwork.weather.bean.EasyWeatherWrapper;
+import com.easynetwork.weather.tools.Log;
 import com.easynetwork.weather.bean.FamilyList;
 import com.easynetwork.weather.bean.User;
 import com.easynetwork.weather.bean.WeatherWrapper;
@@ -22,11 +19,7 @@ import com.easynetwork.weather.view.SimpleWeatherView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.text.TextUtils;
 
 /**
@@ -134,14 +127,6 @@ public class WeatherManager {
         user.lat = latitude + "";
 
         requestWeatherData(user);
-    }
-
-    /**
-     * 请求亲友的简单数据列表，外部可以调用，如果把握不好，不推荐
-     */
-    public void requestFamilyList() {
-        ListDataLoadTask lTask = new ListDataLoadTask();
-        lTask.execute("");
     }
 
     /**
@@ -398,60 +383,7 @@ public class WeatherManager {
         }
     }
 
-    /**
-     * 下载亲友list和简单天气的任务
-     *
-     * @author WenYF
-     */
-    class ListDataLoadTask extends AsyncTask<String, String, FamilyList> {
 
-        private boolean nnIsSuccess = false;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.w(TAG, "start down Load ListData");
-
-            nIsLoadingFlags.put(Constants.LIST_DATA_FILENAME, true);
-            // 通知
-            if (nDataLoadListener != null) {
-                nDataLoadListener.onListDataStartLoad();
-            }
-        }
-
-
-        @Override
-        protected FamilyList doInBackground(String... params) {
-            // 这里下载数据
-            FamilyList easyUserDatas = nWeatherLoader.getFamilyList(nLocalUser.uid);
-
-            nnIsSuccess = true;
-            // 保存本地数据
-            return easyUserDatas;
-        }
-
-        @Override
-        protected void onPostExecute(FamilyList datas) {
-            super.onPostExecute(datas);
-
-            if (!nnIsSuccess) {
-                //
-            }
-
-            nIsLoadingFlags.put(Constants.LIST_DATA_FILENAME, false);
-
-            // 通知
-            if (nDataLoadListener != null && nnIsSuccess) {
-                nDataLoadListener.onListDataLoaded();
-            }
-
-//			for(EasyWeatherWrapper easyData : datas){
-//				WeatherDataLoadTask wTask = new WeatherDataLoadTask(easyData.nUser);
-//				wTask.execute(easyData.nUser);
-//			}
-        }
-
-    }
 
     class RemindStateTask extends AsyncTask<String, String, String> {
 

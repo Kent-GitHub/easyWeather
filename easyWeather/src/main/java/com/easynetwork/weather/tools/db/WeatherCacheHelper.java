@@ -9,9 +9,6 @@ import com.easynetwork.weather.bean.SimpleWeatherData;
 import com.easynetwork.weather.bean.WeatherBean;
 import com.google.gson.Gson;
 
-/**
- * Created by yanming on 2016/8/18.
- */
 public class WeatherCacheHelper {
 
     private WeatherCacheHelper mInstance;

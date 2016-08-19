@@ -1,11 +1,11 @@
-package com.easynetwork.common.util.network;
+package com.easynetwork.weather.tools.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
-import com.easynetwork.common.util.log.Log;
+import com.easynetwork.weather.tools.Log;
 
 /**几个网络相关的工具
  * @author WenYF

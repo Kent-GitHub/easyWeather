@@ -56,7 +56,6 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         mContext = context;
         pref = mContext.getSharedPreferences("setting", Context.MODE_PRIVATE);
         ttsOn = pref.getBoolean("ttsOn", false);
-        Log.e(TAG, "MenuRight: getTTS setting" );
         if (mContext instanceof WeatherActivity) {
             ((WeatherActivity) mContext).setTtsOn(ttsOn);
         }

@@ -1,6 +1,5 @@
 package com.easynetwork.weather.tools;
 
-import com.easynetwork.common.util.screen.ScreenUtil;
 import com.easynetwork.weather.R;
 
 import android.annotation.SuppressLint;
