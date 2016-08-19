@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- 720*1280 screen margins, per the Android Design guidelines. -->
+    
+    <dimen name="list_horizontal_margin">10.0dp</dimen>
+    <dimen name="list_vertical_margin">14.0dp</dimen>
+    
+    <dimen name="list_horizontal_length">340dp</dimen>
+    <dimen name="list_vertical_length">80dp</dimen>
+    
+</resources>

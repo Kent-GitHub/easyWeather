@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#e96e13"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:textSize="32px"
+            android:id="@+id/tv_mng_city"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/manage_city"
+            style="@null"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/add_city"
+            android:text="@string/add"
+            android:textSize="24px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical" />
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/manage_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/list_divider"
+        android:dividerHeight="1px">
+
+    </ListView>
+
+
+</LinearLayout>

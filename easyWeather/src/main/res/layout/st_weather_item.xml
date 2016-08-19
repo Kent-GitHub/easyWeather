@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="62dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:textSize="24px"
+            android:id="@+id/item_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="明天" />
+        <TextView
+            android:textSize="18px"
+            android:id="@+id/item_describe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="晴转多云" />
+    </LinearLayout>
+
+    <TextView
+        android:textSize="28px"
+        android:layout_gravity="center_vertical|end"
+        android:id="@+id/item_tmp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="21~31°" />
+
+</FrameLayout>

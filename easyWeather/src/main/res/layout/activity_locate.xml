@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/locate_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#e96e13"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <EditText
+            android:textSize="32px"
+            android:id="@+id/locate_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:hint="@string/search_city"
+            android:textColorHint="#fff" />
+
+        <Button
+            android:id="@+id/locate_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24px"
+            android:layout_gravity="center_vertical|end"
+            android:text="@string/clear" />
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/locate_listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/list_divider"
+        android:dividerHeight="1px">
+
+    </ListView>
+</LinearLayout>

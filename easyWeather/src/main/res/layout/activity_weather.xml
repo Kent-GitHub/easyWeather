@@ -1,0 +1,37 @@
+<me.tangke.slidemenu.SlideMenu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:slidemenudemo="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/slideMenu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    slidemenudemo:primaryShadowWidth="3dp"
+    slidemenudemo:secondaryShadowWidth="3dp"
+    slidemenudemo:slideDirection="left|right">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/weather_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2684e4"
+        android:orientation="vertical"
+        slidemenudemo:layout_role="content"
+        tools:context="${relativePackage}.${activityClass}">
+
+
+
+        <RelativeLayout
+            android:id="@+id/weather_content_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.easynetwork.weather.view.SimpleWeatherView
+                android:id="@+id/simple_weather"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</me.tangke.slidemenu.SlideMenu>

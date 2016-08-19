@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">天气</string>
+    <string name="hello_world">Hello world!</string>
+	<string name="text_image_desc">this is a image desc!</string>
+	<string name="back">返回</string>
+	
+	<string name="remind_ing">正在提醒,请稍候</string>
+	<string name="remind_succee">已经在家人中提醒了</string>
+	<string name="remind_fail">提醒失败,请稍后再试</string>
+	<string name="st_weather">近期天气</string>
+	<string name="weather_setting">天气设置</string>
+	<string name="search_city">搜索城市</string>
+	<string name="auto_locate">自动定位</string>
+	<string name="manage_city">管理城市</string>
+	<string name="tv_unknow">未知</string>
+	<string name="add">添加</string>
+	<string name="clear">清空</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="back_pressed">#66000000</color>
+    <color name="request_again_text">#6c90d9</color>
+    <color name="remind_bmp_back">#079db8</color>
+    
+    <color name="black_4d4d4d">#4d4d4d</color>
+    <color name="gray_999999">#999999</color>
+    <color name="gray_949599">#949599</color>
+    <color name="black_787878">#787878</color>
+    
+    <color name="white_light_40">#66ffffff</color>
+    
+</resources>
