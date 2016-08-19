@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by yanming on 2016/8/16.
- */
 public class CodeToValues {
 
     private static final Map<Integer, Integer> imageValues = new HashMap<>();
@@ -24,6 +21,11 @@ public class CodeToValues {
         imageValues.put(102, R.drawable.dcr_qlsy_normal);
         imageValues.put(103, R.drawable.dcr_qjdy_normal);
         imageValues.put(104, R.drawable.dcr_yymb_normal);
+        imageValues.put(200, R.drawable.dcr_qlsy_normal);
+        imageValues.put(201, R.drawable.dcr_qlsy_normal);
+        imageValues.put(202, R.drawable.dcr_qlsy_normal);
+        imageValues.put(203, R.drawable.dcr_qlsy_normal);
+        imageValues.put(204, R.drawable.dcr_qlsy_normal);
         imageValues.put(205, R.drawable.dcr_dflx_normal);
         imageValues.put(206, R.drawable.dcr_dflx_normal);
         imageValues.put(207, R.drawable.dcr_dflx_normal);
@@ -73,6 +75,11 @@ public class CodeToValues {
         iconValues.put(102, R.drawable.icon_dy);
         iconValues.put(103, R.drawable.icon_dy);
         iconValues.put(104, R.drawable.icon_yin);
+        iconValues.put(200, R.drawable.icon_na);
+        iconValues.put(201, R.drawable.icon_na);
+        iconValues.put(202, R.drawable.icon_na);
+        iconValues.put(203, R.drawable.icon_na);
+        iconValues.put(204, R.drawable.icon_na);
         iconValues.put(205, R.drawable.icon_na);
         iconValues.put(206, R.drawable.icon_na);
         iconValues.put(207, R.drawable.icon_na);
