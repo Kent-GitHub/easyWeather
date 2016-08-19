@@ -61,7 +61,7 @@ public class SimpleWeatherData {
                 ",今天天气为" + replaceEmpty(dayDescribe) +
                 ",气温" + temR+
                 ",当前实时天气为" + replaceEmpty(describe) +
-                ",实时温度为" + replaceEmpty(rtTmp);
+                ",实时温度为" + replaceEmpty(rtTmp)+"°";
         return speak;
     }
 

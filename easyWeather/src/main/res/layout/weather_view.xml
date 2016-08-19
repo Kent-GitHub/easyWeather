@@ -17,6 +17,7 @@
             android:background="@drawable/left_btn_bg" />
 
         <TextView
+            android:textSize="24px"
             android:id="@+id/title_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,6 +41,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/btn_RBtn"
             android:text="@string/tv_unknow"
+            android:textSize="24px"
             android:textColor="#fff"/>
     </RelativeLayout>
 
@@ -50,7 +52,7 @@
         android:layout_height="0dp">
         <ImageView
             android:id="@+id/rt_describe"
-            android:src="@drawable/dcr_qjdy_normal"
+            android:src="@drawable/dcr_weather_na"
             android:contentDescription="@string/text_image_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -64,7 +66,7 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/iv_weather_icon"
-            android:src="@drawable/sunny"
+            android:src="@drawable/icon_na"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content" />
@@ -88,7 +90,7 @@
         <TextView
             android:text="@string/tv_unknow"
             android:textColor="#fff"
-            android:textSize="25sp"
+            android:textSize="24px"
             android:padding="10dp"
             android:contentDescription="@string/text_image_desc"
             android:id="@+id/tv_weather_describe"
@@ -97,9 +99,9 @@
             android:gravity="center"
             android:layout_height="wrap_content" />
         <TextView
+            android:textSize="24px"
             android:padding="10dp"
             android:text="@string/tv_unknow"
-            android:textSize="25sp"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/tv_tmp_range"

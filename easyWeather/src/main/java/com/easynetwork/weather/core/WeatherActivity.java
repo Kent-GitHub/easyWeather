@@ -266,7 +266,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             }
             refreshAfterLocated = true;
             showTipsView();
-            updateWeatherAfterLocated();
+            //updateWeatherAfterLocated();
         }
     }
 
@@ -326,19 +326,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     }
 
     private RelativeLayout contentView;
-
-
-    @Override
-    public void onBackPressed() {
-        Log.w(TAG, "onBackPressed");
-
-        // 如果nCurrentUser不为空，表示正在显示天气，这样，如果uid和本地的不一样，则回到list
-        if (nCurrentUser != null && !nCurrentUser.uid.equals(nWeatherManager.getLocalUser().uid)) {
-            showListView();
-            return;
-        }
-        super.onBackPressed();
-    }
 
     @Override
     public void onWeatherDataStartLoad(User user) {
@@ -554,9 +541,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         int locType = bdLocation.getLocType();
         if (locType != 61 && locType != 66 && locType != 161) {
             Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
-            hideTipsView();
             return;
         }
+        android.util.Log.e(TAG, "onReceiveLocation: succeed" );
         isLocated = true;
         double latitude = bdLocation.getLatitude();
         double longitude = bdLocation.getLongitude();
@@ -576,7 +563,8 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private void updateWeatherByCity(City city) {
         if (city.getCity() == null) {
             showTipsView();
-            updateWeatherAfterLocated();
+            refreshAfterLocated=true;
+            //updateWeatherAfterLocated();
         }
         android.util.Log.e(TAG, "updateWeatherByCity: " + city.getCity() + "_" + city.getLatitude() + "_" + city.getLongitude());
         SharedPreUtil.setGlobalVar(this, "user_lon", city.getLongitude() + "");
