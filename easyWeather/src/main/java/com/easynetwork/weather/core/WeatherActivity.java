@@ -573,7 +573,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         SharedPreUtil.setGlobalVar(this, "user_city", city.getCity());
         showTipsView();
         //nWeatherManager.requestData(true);
-        nWeatherManager.requestData(city.getLatitude(), city.getLongitude());
+        nWeatherManager.requestData(city.getCity(),city.getLatitude(), city.getLongitude());
     }
 
     @Override

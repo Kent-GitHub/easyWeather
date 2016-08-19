@@ -132,6 +132,15 @@ public class WeatherManager {
         requestWeatherData(user);
     }
 
+    public void requestData(String city, double latitude, double longitude) {
+        User user = new User();
+        user.city = city;
+        user.lon = longitude + "";
+        user.lat = latitude + "";
+        nLocalUser = user;
+        requestWeatherData(user);
+    }
+
     /**
      * 请求天气数据，外部可以调用，如果把握不好，不推荐
      */
@@ -357,6 +366,7 @@ public class WeatherManager {
 
         @Override
         protected WeatherWrapper doInBackground(User... paras) {
+            String city = nLocalUser.city;
             // 这里下载数据
 
             // 如果本地有数据，得到服务器下发的时间标记
@@ -374,7 +384,7 @@ public class WeatherManager {
 
             // 保存本地数据
             saveWeatherData(nnUser.uid, weatherWrapper);
-
+            weatherWrapper.nUser.city = city;
             return weatherWrapper;
         }
 

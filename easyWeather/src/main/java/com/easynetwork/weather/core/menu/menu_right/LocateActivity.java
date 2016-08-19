@@ -32,7 +32,7 @@ import com.easynetwork.weather.tools.db.CityDbHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocateActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, TextWatcher {
+public class LocateActivity extends Activity implements AdapterView.OnItemClickListener, TextWatcher {
 
 
     private EditText mSearchEt;
@@ -49,9 +49,7 @@ public class LocateActivity extends Activity implements View.OnClickListener, Ad
         StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#e96e13"));
         mSearchEt = (EditText) findViewById(R.id.locate_input);
         mListView = (ListView) findViewById(R.id.locate_listView);
-        Button mClearBtn = (Button) findViewById(R.id.locate_clear);
         mSearchEt.addTextChangedListener(this);
-        mClearBtn.setOnClickListener(this);
         mCityDbHelper = new CityDbHelper(this);
         initDatas();
     }
@@ -65,14 +63,6 @@ public class LocateActivity extends Activity implements View.OnClickListener, Ad
         clear();
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.locate_clear:
-                mSearchEt.setText("");
-                break;
-        }
-    }
 
     private static final String TAG = "LocateActivityMYMY";
 
