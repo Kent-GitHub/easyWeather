@@ -1,22 +1,24 @@
 package com.easynetwork.weather.bean;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-/**
- * Created by yanming on 2016/8/17.
- */
 public class SimpleWeatherData {
     private String date;
     private String location;
-    private String weatherCode;
-    private String describe;
+    private String rtWeatherCode;
+    private String dayWeatherCode;
+    private String rtDescribe;
     private String dayDescribe;
     private String rtTmp;
     private String tmpRange;
     private String[] prediction;
     private long timeStamp;
+
+    private List<DailyWeatherData> days = new ArrayList<>();
 
     public SimpleWeatherData() {
     }
@@ -30,23 +32,46 @@ public class SimpleWeatherData {
         NowWeatherData now = weatherData.getNowWeatherData();
         Date date = new Date();
         Calendar c = Calendar.getInstance();
-        StringBuilder dateString = new StringBuilder();
-        dateString.append(new SimpleDateFormat("MM.dd").format(date) + "/");
-        dateString.append(formatWeekday(c.get(Calendar.DAY_OF_WEEK)));
-        setDate(dateString.toString());
+        String dateString = (new SimpleDateFormat("MM.dd").format(date) + "/") +
+                formatWeekday(c.get(Calendar.DAY_OF_WEEK));
+        setDate(dateString);
         setLocation(weatherData.nUser.city);
-        setDescribe(now.txt);
+        setRtDescribe(now.txt);
         setDayDescribe(today.describe);
         setRtTmp(now.tmp);
         setTmpRange(today.minTmp + "~" + today.maxTmp + "°C");
-        setWeatherCode(now.code);
+        setRtWeatherCode(now.code);
         DailyWeatherData tomorrow = weatherData.getTomorrow();
         DailyWeatherData afterTomorrow = weatherData.getAfterTomorrow();
         prediction = new String[]{today.getString(), tomorrow.getString(), afterTomorrow.getString()};
     }
 
-    public SimpleWeatherData(WeatherBean bean){
-        bean.getData().getBasic().getUpdate();
+    public SimpleWeatherData(WeatherBean bean) {
+        //设置date// 08.19/周五
+        Date date = bean.getDate();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        String dateString = (new SimpleDateFormat("MM.dd").format(date) + "/") +
+                formatWeekday(c.get(Calendar.DAY_OF_WEEK));
+        setDate(dateString);
+        //设置location
+        setLocation(bean.getCity());
+        //设置rtWeatherCode
+        setRtWeatherCode(bean.getRtCode());
+        //设置rtDescribe
+        setRtDescribe(bean.getRtDescribe());
+        //设置rtTmp
+        setRtTmp(bean.getRtTmp());
+        //设置dayWeatherCode
+        setDayWeatherCode(bean.getDayCode(0));
+        //设置DayDescribe
+        setDayDescribe(bean.getDayDescribe(0));
+        //设置tmpRange
+        setTmpRange(bean.getTmpRange(0));
+        //设置days
+        days.add(bean.getDailyDate(0));
+        days.add(bean.getDailyDate(1));
+        days.add(bean.getDailyDate(2));
     }
 
     public String getSpeakText() {
@@ -59,9 +84,9 @@ public class SimpleWeatherData {
         }
         speak = "当前城市" + replaceEmpty(location) +
                 ",今天天气为" + replaceEmpty(dayDescribe) +
-                ",气温" + temR+
-                ",当前实时天气为" + replaceEmpty(describe) +
-                ",实时温度为" + replaceEmpty(rtTmp)+"°";
+                ",气温" + temR +
+                ",当前实时天气为" + replaceEmpty(rtDescribe) +
+                ",实时温度为" + replaceEmpty(rtTmp) + "°";
         return speak;
     }
 
@@ -70,6 +95,15 @@ public class SimpleWeatherData {
             return "未知";
         }
         return s;
+    }
+
+    public String getDayWeatherCode() {
+        return dayWeatherCode;
+    }
+
+    public void setDayWeatherCode(String dayWeatherCode) {
+
+        this.dayWeatherCode = dayWeatherCode;
     }
 
     public String getDate() {
@@ -88,12 +122,12 @@ public class SimpleWeatherData {
         this.location = location;
     }
 
-    public String getDescribe() {
-        return describe;
+    public String getRtDescribe() {
+        return rtDescribe;
     }
 
-    public void setDescribe(String describe) {
-        this.describe = describe;
+    public void setRtDescribe(String rtDescribe) {
+        this.rtDescribe = rtDescribe;
     }
 
     public String getDayDescribe() {
@@ -104,12 +138,12 @@ public class SimpleWeatherData {
         this.dayDescribe = dayDescribe;
     }
 
-    public String getWeatherCode() {
-        return weatherCode;
+    public String getRtWeatherCode() {
+        return rtWeatherCode;
     }
 
-    public void setWeatherCode(String weatherCode) {
-        this.weatherCode = weatherCode;
+    public void setRtWeatherCode(String rtWeatherCode) {
+        this.rtWeatherCode = rtWeatherCode;
     }
 
     public String getRtTmp() {

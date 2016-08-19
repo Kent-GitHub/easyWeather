@@ -2,9 +2,6 @@ package com.easynetwork.weather.bean;
 
 import java.io.Serializable;
 
-/**
- * Created by yanming on 2016/8/17.
- */
 public class City implements Serializable {
     String city;
     double latitude;

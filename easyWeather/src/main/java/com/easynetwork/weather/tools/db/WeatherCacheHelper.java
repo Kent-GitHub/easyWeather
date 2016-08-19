@@ -41,6 +41,7 @@ public class WeatherCacheHelper {
             String jsonString = cursor.getString(cursor.getColumnIndex("jsonText"));
             Gson gson = new Gson();
             WeatherBean weatherBean = gson.fromJson(jsonString, WeatherBean.class);
+            SimpleWeatherData swd=new SimpleWeatherData(weatherBean);
         }
         return date;
     }

@@ -1,6 +1,5 @@
 package com.easynetwork.weather.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.core.WeatherActivity;
 import com.easynetwork.weather.core.menu.menu_right.CodeToValues;
-import com.easynetwork.weather.tools.StatusBarUtils;
 import com.easynetwork.weather.tools.ToastUtil;
 import com.easynetwork.weather.R;
 import com.easynetwork.weather.bean.DailyWeatherData;
@@ -144,7 +142,7 @@ public class SimpleWeatherView extends LinearLayout {
             this.location.setText(data.getLocation());
         }
         if (RTTvDescribe != null) {
-            RTTvDescribe.setText(data.getDescribe());
+            RTTvDescribe.setText(data.getRtDescribe());
         }
         if (RTTmp != null) {
             RTTmp.setText(data.getRtTmp());
@@ -153,7 +151,7 @@ public class SimpleWeatherView extends LinearLayout {
             tmpRange.setText(data.getTmpRange());
         }
         try {
-            int code = Integer.parseInt(data.getWeatherCode());
+            int code = Integer.parseInt(data.getRtWeatherCode());
             if (ivDescribe != null) {
                 ivDescribe.setImageResource(CodeToValues.getImageDescribe(code));
             }

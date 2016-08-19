@@ -1,11 +1,13 @@
 package com.easynetwork.weather.bean;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Created by yanming on 2016/8/18.
- */
 public class WeatherBean {
+
+    private static final int MAX_DAY = 3;
 
     /**
      * basic : {"city":"杭州","cnty":"中国","update":"2016-08-18 14:30"}
@@ -145,6 +147,11 @@ public class WeatherBean {
             private String cnty;
             private String update;
 
+            /**
+             * city : 杭州
+             * cnty : 中国
+             * update : 2016-08-18 14:30
+             */
             public String getCity() {
                 return city;
             }
@@ -175,6 +182,11 @@ public class WeatherBean {
             private String pm25;
             private String aqi;
 
+            /**
+             * qlty : 优
+             * pm25 : 22
+             * aqi : 48
+             */
             public String getQlty() {
                 return qlty;
             }
@@ -209,6 +221,10 @@ public class WeatherBean {
             private CondBean cond;
             private String tmp;
 
+            /**
+             * cond : {"code":"100","txt":"晴"}
+             * tmp : 36
+             */
             public CondBean getCond() {
                 return cond;
             }
@@ -248,6 +264,12 @@ public class WeatherBean {
         }
 
         public static class DailyForecastBean {
+            /**
+             * date : 今天8月18日
+             * astro : {"sr":"05:17","ss":"18:44"}
+             * tmp : {"min":"28","max":"37"}
+             * cond : {"code":"100","day":"高温天气 注意防暑","abstract":"晴"}
+             */
             private String date;
             /**
              * sr : 05:17
@@ -376,11 +398,80 @@ public class WeatherBean {
     }
 
 
-    public String getDate() {
-        String timeStamp = getData().getBasic().getUpdate();
-        if (timeStamp.length() > 10) {
-            return timeStamp.substring(0, 10);
+    //----------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
+    //为SimpleWeatherData提供方法
+
+    public Date getDate() {
+        String time = getData().getBasic().getUpdate();
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public String getCity() {
+        return getData().getBasic().getCity();
+    }
+
+    public String getRtCode() {
+        return getData().getNow().getCond().getCode();
+    }
+
+    public String getDayCode(int day) {
+        if (day > MAX_DAY - 1) return null;
+        return getData().getDaily_forecast().get(day).getCond().getCode();
+    }
+
+    public String getRtDescribe() {
+        return getData().getNow().getCond().getTxt();
+    }
+
+    public String getDayDescribe(int day) {
+        if (day > MAX_DAY - 1) return null;
+        return getData().getDaily_forecast().get(day).getCond().getDay();
+    }
+
+    public String getRtTmp() {
+        return getData().getNow().getTmp();
+    }
+
+    public String getTmpRange(int day) {
+        if (day > MAX_DAY - 1) return null;
+        String max = getData().getDaily_forecast().get(day).getTmp().getMax();
+        String min = getData().getDaily_forecast().get(day).getTmp().getMin();
+        return max + "~" + min + "°C";
+    }
+
+    public long getTimeStamp() {
+        String time = getData().getBasic().getUpdate();
+        long timeStamp = -1;
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(time);
+            timeStamp = date.getTime() / 1000;
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         return timeStamp;
+    }
+
+    public DailyWeatherData getDailyDate(int day) {
+        if (day > MAX_DAY - 1) return null;
+        DailyWeatherData data = new DailyWeatherData();
+        DataBean.DailyForecastBean dailyBean = getData().getDaily_forecast().get(day);
+        if (day == 0) {
+            data.date = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).replace("-0", "-");
+        } else {
+            data.date = dailyBean.getDate();
+        }
+        data.txt = dailyBean.getCond().getDay();
+        data.code = dailyBean.getCond().getCode();
+        data.describe = dailyBean.getCond().getAbstractDescribe();
+        data.minTmp = dailyBean.getTmp().getMin();
+        data.maxTmp = dailyBean.getTmp().getMax();
+        return data;
     }
 }

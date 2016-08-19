@@ -13,7 +13,7 @@
         android:paddingRight="10dp">
 
         <EditText
-            android:textSize="32px"
+            android:textSize="32dp"
             android:id="@+id/locate_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
             android:id="@+id/locate_clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="24px"
+            android:textSize="24dp"
             android:layout_gravity="center_vertical|end"
             android:text="@string/clear" />
     </FrameLayout>

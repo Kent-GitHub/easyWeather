@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,6 @@ public class LocateActivity extends Activity implements View.OnClickListener, Ad
 
     private EditText mSearchEt;
     private ListView mListView;
-    private Button mClearBtn;
     private List<City> mDatas;
     private MyAdapter mAdapter;
     private CityDbHelper mCityDbHelper;
@@ -49,7 +49,7 @@ public class LocateActivity extends Activity implements View.OnClickListener, Ad
         StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#e96e13"));
         mSearchEt = (EditText) findViewById(R.id.locate_input);
         mListView = (ListView) findViewById(R.id.locate_listView);
-        mClearBtn = (Button) findViewById(R.id.locate_clear);
+        Button mClearBtn = (Button) findViewById(R.id.locate_clear);
         mSearchEt.addTextChangedListener(this);
         mClearBtn.setOnClickListener(this);
         mCityDbHelper = new CityDbHelper(this);
@@ -173,6 +173,7 @@ public class LocateActivity extends Activity implements View.OnClickListener, Ad
             tv.setPadding(10, 0, 10, 0);
             tv.setGravity(Gravity.CENTER_VERTICAL);
             tv.setText(city.getCity());
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 28);
             if (i == 0) {
                 Drawable drawable = getResources().getDrawable(R.drawable.icon_locate);
                 drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());

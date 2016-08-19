@@ -2,7 +2,6 @@ package com.easynetwork.weather.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.easynetwork.weather.bean.City;
 import com.easynetwork.weather.bean.WeatherWrapper;
@@ -109,8 +108,8 @@ public class SharedPreUtil {
         SharedPreferences.Editor storage = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE).edit();
         storage.putString("simpleData", simpleData.getDate());
         storage.putString("simpleLocation", simpleData.getLocation());
-        storage.putString("simpleCode", simpleData.getWeatherCode());
-        storage.putString("simpleDescribe", simpleData.getDescribe());
+        storage.putString("simpleCode", simpleData.getRtWeatherCode());
+        storage.putString("simpleDescribe", simpleData.getRtDescribe());
         storage.putString("simpleDayDescribe", simpleData.getDayDescribe());
         storage.putString("simpleRTTMP", simpleData.getRtTmp());
         storage.putString("simpleTMPR", simpleData.getTmpRange());
@@ -130,8 +129,8 @@ public class SharedPreUtil {
         date.setTimeStamp(timeStamp);
         date.setDate(storage.getString("simpleData", ""));
         date.setLocation(storage.getString("simpleLocation", ""));
-        date.setWeatherCode(storage.getString("simpleCode", ""));
-        date.setDescribe(storage.getString("simpleDescribe", ""));
+        date.setRtWeatherCode(storage.getString("simpleCode", ""));
+        date.setRtDescribe(storage.getString("simpleDescribe", ""));
         date.setDayDescribe(storage.getString("simpleDayDescribe", ""));
         date.setRtTmp(storage.getString("simpleRTTMP", ""));
         date.setTmpRange(storage.getString("simpleTMPR", ""));

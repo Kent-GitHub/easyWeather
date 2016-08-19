@@ -21,6 +21,11 @@ public class DailyWeatherData implements Serializable {
     public String minTmp = "--";
     public String maxTmp = "--";
 
+
+    public String getTmpRange() {
+        return minTmp + "~" + maxTmp + "°C";
+    }
+
     public final String getString() {
         return date + "、" + txt + "、" + code + "、" + describe + "、" + minTmp + "、" + maxTmp;
     }

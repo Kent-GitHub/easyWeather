@@ -9,7 +9,6 @@ import com.easynetwork.weather.tools.network.NetworkUtil;
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
 import com.easynetwork.weather.bean.WeatherWrapper;
-import com.easynetwork.weather.tools.MyLocationListener;
 import com.easynetwork.weather.tools.StatusBarUtils;
 import com.easynetwork.weather.tools.TextSpeakControl;
 import com.easynetwork.weather.tools.ToastUtil;
@@ -29,10 +28,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -51,7 +52,7 @@ import me.tangke.slidemenu.SlideMenu;
  * @date 2015/9/10
  */
 public class WeatherActivity extends Activity implements WeatherManager.DataLoadListener,
-        SlideMenu.OnSlideStateChangeListener, BDLocationListener {
+        SlideMenu.OnSlideStateChangeListener, BDLocationListener, View.OnClickListener {
 
     private final static String TAG = "WeatherActivityMYMY";
     private final static boolean log2file = true;
@@ -64,8 +65,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
 
     public LocationClient mLocationClient = null;
-    public BDLocationListener myListener = new MyLocationListener();
-
 
     /**
      * 天气数据下载等管理器
@@ -190,14 +189,16 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // 初始化资源索引
-
         if (log2file) {
             Log.initFile(this);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#2684e4"));
         contentView = (RelativeLayout) findViewById(R.id.weather_content_view);
         mWeatherView = (SimpleWeatherView) findViewById(R.id.simple_weather);
+        findViewById(R.id.title_LBtn).setOnClickListener(this);
+        findViewById(R.id.btn_RBtn).setOnClickListener(this);
 
         //初始化SlideMenu
         mSlideMenu = (SlideMenu) findViewById(R.id.slideMenu);
@@ -371,7 +372,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     }
 
     private void showTipsView() {
-
+        StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#2684e4"));
 
         if (NetworkUtil.getCurrentNetwork(this) == Network.NT_NONE) {
             // 显示没有网络
@@ -543,7 +544,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
             return;
         }
-        android.util.Log.e(TAG, "onReceiveLocation: succeed" );
+        android.util.Log.e(TAG, "onReceiveLocation: succeed");
         isLocated = true;
         double latitude = bdLocation.getLatitude();
         double longitude = bdLocation.getLongitude();
@@ -563,7 +564,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private void updateWeatherByCity(City city) {
         if (city.getCity() == null) {
             showTipsView();
-            refreshAfterLocated=true;
+            refreshAfterLocated = true;
             //updateWeatherAfterLocated();
         }
         android.util.Log.e(TAG, "updateWeatherByCity: " + city.getCity() + "_" + city.getLatitude() + "_" + city.getLongitude());
@@ -575,4 +576,15 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         nWeatherManager.requestData(city.getLatitude(), city.getLongitude());
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.title_LBtn:
+                openSlideMenu(false);
+                break;
+            case R.id.btn_RBtn:
+                openSlideMenu(true);
+                break;
+        }
+    }
 }

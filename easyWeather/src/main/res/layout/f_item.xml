@@ -13,7 +13,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        android:textSize="28px"
+        android:textSize="28dp"
         android:id="@+id/f_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

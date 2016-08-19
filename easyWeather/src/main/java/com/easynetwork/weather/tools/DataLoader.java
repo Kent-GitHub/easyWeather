@@ -11,16 +11,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.text.TextUtils;
-
-import com.easynetwork.weather.bean.EasyWeatherWrapper;
-import com.easynetwork.weather.bean.FamilyList;
-import com.easynetwork.weather.bean.User;
+import com.easynetwork.weather.bean.SimpleWeatherData;
+import com.easynetwork.weather.bean.WeatherBean;
 import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.core.Constants;
 import com.easynetwork.weather.bean.AirQualityData;
 import com.easynetwork.weather.bean.DailyWeatherData;
 import com.easynetwork.weather.bean.NowWeatherData;
+import com.google.gson.Gson;
 
 /**
  * 下载天气数据的loader<br>
@@ -60,6 +58,28 @@ public class DataLoader {
         }
 
         return wrapper;
+    }
+
+    public SimpleWeatherData getSimpleWeatherData(String latitude, String longitude) {
+        SimpleWeatherData data = new SimpleWeatherData();
+        long time = System.currentTimeMillis() / 1000;
+        String jsonResult = "";
+        // TODO: 2016/8/16 更换查询接口
+        String httpUrl;
+        if (useURL1) {
+            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        } else {
+            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        }
+        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
+        jsonResult = request(httpUrl);
+        if (jsonResult == null) {
+            return data;
+        }
+        Gson gson = new Gson();
+        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+        data = new SimpleWeatherData(bean);
+        return data;
     }
 
     private boolean useURL1;

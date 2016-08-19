@@ -5,9 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import com.easynetwork.weather.bean.City;
+import com.easynetwork.weather.bean.SimpleWeatherData;
 import com.easynetwork.weather.tools.Log;
-import com.easynetwork.weather.bean.FamilyList;
 import com.easynetwork.weather.bean.User;
 import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.tools.BitmapUtil;
@@ -19,6 +21,7 @@ import com.easynetwork.weather.view.SimpleWeatherView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -261,10 +264,8 @@ public class WeatherManager {
     }
 
 
-
     /**
-
-    /**
+     * /**
      * 得到当前的日期，1221表示12月21号
      *
      * @return
@@ -316,6 +317,18 @@ public class WeatherManager {
         //public void onBackTested(String result);
     }
 
+    class WeatherDateDownloadTask extends AsyncTask<City, Object, SimpleWeatherData> {
+
+        private City mCity;
+
+        @Override
+        protected SimpleWeatherData doInBackground(City... cities) {
+            SimpleWeatherData data;
+//            data=mwe
+            return null;
+        }
+    }
+
     /**
      * 下载天气数据异步任务
      *
@@ -347,11 +360,10 @@ public class WeatherManager {
             // 这里下载数据
 
             // 如果本地有数据，得到服务器下发的时间标记
-            WeatherWrapper weatherWrapper ;
+            WeatherWrapper weatherWrapper;
             String timeFlag = "-1";
 
             timeFlag = System.currentTimeMillis() / 1000 + "";
-
 
             // 请求服务器获取数据
             //weatherWrapper = nWeatherLoader.getWeatherData(nnUser, timeFlag);
@@ -382,7 +394,6 @@ public class WeatherManager {
 
         }
     }
-
 
 
     class RemindStateTask extends AsyncTask<String, String, String> {

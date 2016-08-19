@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +115,7 @@ public class ManageCityActivity extends Activity implements View.OnClickListener
             textView.setPadding(10, 0, 10, 0);
             textView.setLayoutParams(lp);
             textView.setGravity(Gravity.CENTER_VERTICAL);
-
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 28);
             textView.setText(mDatas.get(i).getCity());
             return textView;
         }
