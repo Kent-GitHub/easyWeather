@@ -53,6 +53,10 @@ public class WeatherBean {
         this.errMsg = errMsg;
     }
 
+    public void setCity(String city) {
+        getData().getBasic().setCity(city);
+    }
+
     public static class DataBean {
         /**
          * city : 杭州

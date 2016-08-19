@@ -61,7 +61,11 @@ public class DataLoader {
     }
 
     public SimpleWeatherData getSimpleWeatherData(String latitude, String longitude) {
-        SimpleWeatherData data = new SimpleWeatherData();
+        return getSimpleWeatherData(null, latitude, longitude);
+    }
+
+    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
+        SimpleWeatherData data = null;
         long time = System.currentTimeMillis() / 1000;
         String jsonResult = "";
         // TODO: 2016/8/16 更换查询接口
@@ -74,10 +78,17 @@ public class DataLoader {
         android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
         jsonResult = request(httpUrl);
         if (jsonResult == null) {
-            return data;
+            return null;
         }
         Gson gson = new Gson();
         WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+        if (!bean.getErrNum().equals("200")) {
+            return null;
+        }
+        if (city != null) {
+            bean.setCity(city);
+        }
+        String jsonString = gson.toJson(bean);
         data = new SimpleWeatherData(bean);
         return data;
     }

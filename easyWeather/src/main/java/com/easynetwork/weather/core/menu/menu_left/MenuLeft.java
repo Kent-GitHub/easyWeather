@@ -103,6 +103,17 @@ public class MenuLeft extends LinearLayout {
         mAdapter.notifyDataSetChanged();
     }
 
+    public void setSimpleDatas(SimpleWeatherData data) {
+        mDatas.clear();
+        data.getDays().get(0).date = "今天";
+        data.getDays().get(1).date = "明天";
+        data.getDays().get(2).date = "后天";
+        mDatas.add(data.getDays().get(0));
+        mDatas.add(data.getDays().get(1));
+        mDatas.add(data.getDays().get(2));
+        mAdapter.notifyDataSetChanged();
+    }
+
     public void setDatas(SimpleWeatherData data) {
         if (mDatas == null) return;
         mDatas.clear();

@@ -314,13 +314,8 @@ public class WeatherManager {
 
         public void onWeatherDataLoaded(WeatherWrapper data);
 
-        public void onListDataStartLoad();
+        void onSimpleWeatherDataLoaded(SimpleWeatherData data);
 
-        public void onListDataLoaded();
-
-        public void onUploadRemindState(String result);
-
-        public void onUploadRemindBitmaped(String result);
 
         /**背景测试*/
         //public void onBackTested(String result);
@@ -332,9 +327,15 @@ public class WeatherManager {
 
         @Override
         protected SimpleWeatherData doInBackground(City... cities) {
+            City c = cities[0];
             SimpleWeatherData data;
-//            data=mwe
-            return null;
+            data = nWeatherLoader.getSimpleWeatherData(c.getCity(), c.getLatitude() + "", c.getLongitude() + "");
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(SimpleWeatherData simpleWeatherData) {
+            nDataLoadListener.onSimpleWeatherDataLoaded(simpleWeatherData);
         }
     }
 
@@ -428,7 +429,6 @@ public class WeatherManager {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (nDataLoadListener != null) {
-                nDataLoadListener.onUploadRemindState(result);
             }
         }
     }
@@ -461,7 +461,6 @@ public class WeatherManager {
             super.onPostExecute(datas);
             // 通知
             if (nDataLoadListener != null) {
-                nDataLoadListener.onUploadRemindBitmaped(datas);
             }
         }
     }

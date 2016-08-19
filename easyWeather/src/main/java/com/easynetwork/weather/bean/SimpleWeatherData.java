@@ -74,6 +74,10 @@ public class SimpleWeatherData {
         days.add(bean.getDailyDate(2));
     }
 
+    public List<DailyWeatherData> getDays() {
+        return days;
+    }
+
     public String getSpeakText() {
         String speak;
         String temR;

@@ -357,19 +357,21 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     }
 
     @Override
-    public void onListDataStartLoad() {
-
+    public void onSimpleWeatherDataLoaded(SimpleWeatherData data) {
+        if (data == null || mWeatherView == null) return;
+        refreshAfterLocated = false;
+        mWeatherView.setSimpleWeatherData(data);
+        mMenuLeft.setSimpleDatas(data);
+        if (mWeatherView.getParent() == null) {
+            contentView.removeAllViews();
+            contentView.addView(mWeatherView);
+        }
+        hideTipsView();
+        if (ttsOn) {
+            ttsControl.speak("天气刷新成功," + data.getSpeakText());
+        }
     }
 
-    @Override
-    public void onListDataLoaded() {
-
-    }
-
-    @Override
-    public void onUploadRemindState(String result) {
-
-    }
 
     private void showTipsView() {
         StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#2684e4"));
@@ -418,27 +420,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         contentView.addView(mWeatherView);
     }
 
-
-    @Override
-    public void onUploadRemindBitmaped(String result) {
-        /*
-        16201：token缺失
-		16202：token校验失败
-		16203：sid传递错误
-		16204：没有创建相关家庭组，暂时不能提醒
-		16205：图片类型不合法或者图片上传的键值不对
-		16206：图片上传过多，最大为3张
-		*/
-        isReminding = false;
-        if (result.equals("200")) {
-            ToastUtil.showText(this, getResources().getString(R.string.remind_succee));
-        }/*else if(result.equals("16204")){
-            ToastUtil.showText(this, "您还没有创建家庭组!");
-		}*/ else {
-            ToastUtil.showText(this, getResources().getString(R.string.remind_fail));
-        }
-        Log.i("UploadFileLoader", "result:" + result.toString());
-    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -573,12 +554,12 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         SharedPreUtil.setGlobalVar(this, "user_city", city.getCity());
         showTipsView();
         //nWeatherManager.requestData(true);
-        nWeatherManager.requestData(city.getCity(),city.getLatitude(), city.getLongitude());
+        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.title_LBtn:
                 openSlideMenu(false);
                 break;

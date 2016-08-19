@@ -187,4 +187,37 @@ public class SimpleWeatherView extends LinearLayout {
                 return "周八";
         }
     }
+
+    public void setSimpleWeatherData(SimpleWeatherData data) {
+        if (this.date != null) {
+            this.date.setText(data.getDate());
+        }
+        if (this.location != null) {
+            this.location.setText(data.getLocation());
+        }
+        if (RTTvDescribe != null) {
+            RTTvDescribe.setText(data.getRtDescribe());
+        }
+        if (RTTmp != null) {
+            RTTmp.setText(data.getRtTmp());
+        }
+        if (tmpRange != null) {
+            tmpRange.setText(data.getTmpRange());
+        }
+        try {
+            int code = Integer.parseInt(data.getRtWeatherCode());
+            if (ivDescribe != null) {
+                ivDescribe.setImageResource(CodeToValues.getImageDescribe(code));
+            }
+            if (icon != null) {
+                icon.setImageResource(CodeToValues.getIconDescribe(code));
+            }
+            setBackgroundColor(CodeToValues.getColorByCode(code));
+            if (mContext instanceof WeatherActivity) {
+                ((WeatherActivity) mContext).setStatusBarColor(CodeToValues.getColorByCode(code));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "setWeatherData: weatherCodeError");
+        }
+    }
 }
