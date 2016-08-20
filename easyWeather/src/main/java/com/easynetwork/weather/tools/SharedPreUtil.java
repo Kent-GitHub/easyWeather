@@ -121,6 +121,16 @@ public class SharedPreUtil {
         storage.commit();
     }
 
+    public static void saveSimpleData(Context context, String key, String data) {
+        SharedPreferences.Editor storage = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE).edit();
+        storage.putString(key, data).commit();
+    }
+
+    public static String getSimpleData(Context context, String key) {
+        SharedPreferences pref = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE);
+        return pref.getString(key, null);
+    }
+
     public static SimpleWeatherData getWeatherData(Context context) {
         SharedPreferences storage = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE);
         long timeStamp = storage.getLong("simpleTimeStamp", -1);

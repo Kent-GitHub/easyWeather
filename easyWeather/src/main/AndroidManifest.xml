@@ -3,7 +3,6 @@
     package="com.easynetwork.weather"
     android:versionCode="34"
     android:versionName="1.0.04.20160820">
-    <!--android:versionName="1.1.33.20160616"-->
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="21" />

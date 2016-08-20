@@ -35,7 +35,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import me.tangke.slidemenu.SlideMenu;
 
@@ -183,13 +182,10 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         nWeatherManager = WeatherManager.createManager(this);
         nCurrentUser = nWeatherManager.getLocalUser();
         nListPosition = new Point();
-        City city;
-        if (getIntent() != null && (city = (City) getIntent().getSerializableExtra("city")) != null) {
-            updateWeatherByCity(city);
-        } else {
-            //获取缓存天气数据或从网络获取数据
-            initWeather();
-        }
+
+//        initWeather();
+        initSimpleWeather();
+
         android.util.Log.e(TAG, "onCreate: ");
         mLocationClient = new LocationClient(getApplicationContext());
         initLocation();
@@ -207,6 +203,53 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     }
 
     private boolean refreshAfterLocated;
+    private City currentCity;
+    private City locatedCity;
+
+    private void initSimpleWeather() {
+        String city = null;
+        long timeStamp;
+        double latitude;
+        double longitude;
+        String json = null;
+        try {
+            city = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_CITY);
+            timeStamp = Long.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_STAMP));
+            latitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LATITUDE));
+            longitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE));
+            json = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_JSON);
+            android.util.Log.e(TAG, "getSimpleWeatherData: got it");
+            currentCity = new City(city, latitude, longitude);
+        } catch (Exception e) {
+            requestAfterLocated();
+            e.printStackTrace();
+            return;
+        }
+
+        if (city == null || city.equals("") || json == null || json.equals("")) {
+            requestAfterLocated();
+            return;
+        }
+        long nowStamp = System.currentTimeMillis() / 1000;
+
+        if (nowStamp - timeStamp > Constants.refreshInterval) {
+            nWeatherManager.requestData(currentCity);
+            return;
+        }
+        android.util.Log.e(TAG, "set date form local");
+        SimpleWeatherData data = JsonUtil.jsonToSWD(json);
+        mWeatherView.setSimpleWeatherData(data);
+        mMenuLeft.setSimpleDatas(data);
+    }
+
+    private void requestAfterLocated() {
+        if (!isLocated) {
+            refreshAfterLocated = true;
+            return;
+        }
+        nWeatherManager.requestData(locatedCity);
+    }
+
 
     private void initWeather() {
         SimpleWeatherData weatherData = SharedPreUtil.getWeatherData(this);
@@ -217,6 +260,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             long timeStamp = weatherData.getTimeStamp();
             if (rtTimeStamp - timeStamp > 3 * 60 * 60) {
                 // TODO: 2016/8/20 未切换加载方法
+                android.util.Log.e(TAG, "initWeather: requestData1");
                 nWeatherManager.requestData();
             } else {
                 if (ttsOn) {
@@ -463,27 +507,27 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     public void onReceiveLocation(BDLocation bdLocation) {
         int locType = bdLocation.getLocType();
+        //定位失败处理
         if (locType != 61 && locType != 66 && locType != 161) {
-            android.util.Log.e(TAG, "onReceiveLocation: " + locType);
+            android.util.Log.e(TAG, "onReceiveLocation: local failed with code:" + locType);
             ToastUtil.showText(this, "定位失败");
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
                 hideTipsView();
             }
             return;
         }
-        android.util.Log.e(TAG, "onReceiveLocation: succeed");
+        //定位成功处理
         isLocated = true;
+        android.util.Log.e(TAG, "onReceiveLocation: succeed");
         double latitude = bdLocation.getLatitude();
         double longitude = bdLocation.getLongitude();
         String currentCity = bdLocation.getAddress().city;
         WeatherApplication.setCurrentCity(currentCity);
         if (currentCity != null && !"".equals(currentCity)) {
-            City c = new City(currentCity, latitude, longitude);
-            WeatherApplication.setLocatedCity(c);
+            locatedCity = new City(currentCity, latitude, longitude);
+            WeatherApplication.setLocatedCity(locatedCity);
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
-                // TODO: 2016/8/20 切换请求方法
-                nWeatherManager.requestData(latitude, longitude);
-//                nWeatherManager.requestData(c);
+                nWeatherManager.requestData(locatedCity);
             }
         }
         SharedPreUtil.setGlobalVar(this, "user_lon", longitude + "");
@@ -494,18 +538,17 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private void updateWeatherByCity(City city) {
         if (city.getCity() == null) {
             showTipsView();
-            refreshAfterLocated = true;
-            //updateWeatherAfterLocated();
+            requestAfterLocated();
         }
         android.util.Log.e(TAG, "updateWeatherByCity: " + city.getCity() + "_" + city.getLatitude() + "_" + city.getLongitude());
         SharedPreUtil.setGlobalVar(this, "user_lon", city.getLongitude() + "");
         SharedPreUtil.setGlobalVar(this, "user_lat", city.getLatitude() + "");
         SharedPreUtil.setGlobalVar(this, "user_city", city.getCity());
         showTipsView();
-        //nWeatherManager.requestData(true);
         //// TODO: 2016/8/20 切换请求方法
-//        nWeatherManager.requestData(city);
-        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
+        android.util.Log.e(TAG, "updateWeatherByCity: requestData3");
+        nWeatherManager.requestData(city);
+//        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
     }
 
     @Override

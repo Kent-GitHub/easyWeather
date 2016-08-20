@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.SimpleWeatherData;
 import com.easynetwork.weather.bean.WeatherBean;
 import com.easynetwork.weather.bean.WeatherWrapper;
@@ -27,7 +28,6 @@ import com.google.gson.Gson;
  */
 public class DataLoader {
     private final static String TAG = "WeatherLoader";
-
 
 
     public WeatherWrapper getWeatherData(String latitude, String longitude) {
@@ -62,38 +62,47 @@ public class DataLoader {
         return wrapper;
     }
 
-//    public SimpleWeatherData getSimpleWeatherData(String latitude, String longitude) {
-//        return getSimpleWeatherData(null, latitude, longitude);
-//    }
+    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
+        SimpleWeatherData data;
+        long time = System.currentTimeMillis() / 1000;
+        String jsonResult;
+        // TODO: 2016/8/16 更换查询接口
+        String httpUrl;
+        if (useURL1) {
+            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        } else {
+            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        }
+        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
+        jsonResult = request(httpUrl);
+        if (jsonResult == null) {
+            return null;
+        }
 
-//    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
-//        SimpleWeatherData data = null;
-//        long time = System.currentTimeMillis() / 1000;
-//        String jsonResult = "";
-//        // TODO: 2016/8/16 更换查询接口
-//        String httpUrl;
-//        if (useURL1) {
-//            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
-//        } else {
-//            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
-//        }
-//        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
-//        jsonResult = request(httpUrl);
-//        if (jsonResult == null) {
-//            return null;
-//        }
-//        Gson gson = new Gson();
-//        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
-//        if (!bean.getErrNum().equals("200")) {
-//            return null;
-//        }
-//        if (city != null) {
-//            bean.setCity(city);
-//        }
-//        String jsonString = gson.toJson(bean);
-//        data = new SimpleWeatherData(bean);
-//        return data;
-//    }
+        int start = jsonResult.indexOf("{");
+        if (start == -1) return null;
+        jsonResult = jsonResult.substring(start);
+
+
+        Gson gson = new Gson();
+        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+        if (!bean.getErrNum().equals("200")) {
+            return null;
+        }
+        if (city != null) {
+            bean.setCity(city);
+        }
+        String jsonString = gson.toJson(bean);
+        String stamp = System.currentTimeMillis() / 1000 + "";
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_JSON, jsonString);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_LATITUDE, latitude);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE, longitude);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_STAMP, stamp);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_CITY, city);
+        android.util.Log.e(TAG, "getSimpleWeatherData: saved");
+        data = new SimpleWeatherData(bean);
+        return data;
+    }
 
     private boolean useURL1;
 
@@ -151,6 +160,7 @@ public class DataLoader {
 
         // 得到basic的json数据
         JSONObject basicJson = json.getJSONObject("basic");
+
         if (basicJson != null) {
             wrapper.nUser.city = basicJson.getString("city");
             wrapper.nUpdate = basicJson.getString("update");

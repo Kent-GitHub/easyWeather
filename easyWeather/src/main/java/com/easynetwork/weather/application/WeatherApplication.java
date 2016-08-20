@@ -18,6 +18,7 @@ public class WeatherApplication extends Application {
 
     @Override
     public void onCreate() {
+
         super.onCreate();
         CrashHandler.getInstance().init(this);
 
@@ -25,6 +26,7 @@ public class WeatherApplication extends Application {
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
 
+        context = this;
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
     }
@@ -42,7 +44,7 @@ public class WeatherApplication extends Application {
     }
 
     public static void setCurrentCity(String currentCity) {
-        if (currentCity==null)currentCity="未知";
+        if (currentCity == null) currentCity = "未知";
         WeatherApplication.currentCity = currentCity;
     }
 
@@ -66,4 +68,6 @@ public class WeatherApplication extends Application {
     public static void setLocatedCity(City locatedCity) {
         WeatherApplication.locatedCity = locatedCity;
     }
+
+    public static Context context;
 }

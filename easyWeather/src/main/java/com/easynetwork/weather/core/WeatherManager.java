@@ -149,43 +149,6 @@ public class WeatherManager {
     }
 
     /**
-     * 保存绘制提醒图片
-     */
-    public boolean saveRemindBitmap(String uId, HashMap<String, Bitmap> bitmapMap) {
-        boolean bool = false;
-        String filesDir = nContext.getFilesDir() + Constants.WEATHER_REMIND_FOLDER + File.separator;
-        if (!TextUtils.isEmpty(uId)) {
-            filesDir = nContext.getFilesDir() + Constants.WEATHER_REMIND_FOLDER + File.separator + uId + File.separator;
-        }
-        if (bitmapMap != null && !bitmapMap.isEmpty()) {
-            for (String key : bitmapMap.keySet()) {
-                bool = BitmapUtil.saveBitmap2file(bitmapMap.get(key), filesDir + key);
-                //bool = BitmapUtil.saveBitmap2file(bitmapMap.get(key), new File("/sdcard/tq/"+key));
-                if (!bool) {
-                    break;
-                }
-            }
-        }
-        return bool;
-    }
-
-    /**
-     * 上传提醒状态
-     */
-    public void getUploadRemindState(String uId) {
-        RemindStateTask rsTask = new RemindStateTask();
-        rsTask.execute(uId);
-    }
-
-    /**
-     * 上传提醒图片
-     */
-    public void uploadRemindBitmap(String uId) {
-        RemindBitmapTask rbTask = new RemindBitmapTask();
-        rbTask.execute(uId);
-    }
-
-    /**
      * @return 得到本地的用户
      */
     public User getLocalUser() {
@@ -330,8 +293,8 @@ public class WeatherManager {
 
         @Override
         protected SimpleWeatherData doInBackground(City... cities) {
-            SimpleWeatherData data=null;
-//            data = nWeatherLoader.getSimpleWeatherData(mCity.getCity(), mCity.getLatitude() + "", mCity.getLongitude() + "");
+            SimpleWeatherData data;
+            data = nWeatherLoader.getSimpleWeatherData(mCity.getCity(), mCity.getLatitude() + "", mCity.getLongitude() + "");
             return data;
         }
 
