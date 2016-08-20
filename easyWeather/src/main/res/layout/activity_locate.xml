@@ -13,14 +13,14 @@
         android:paddingRight="10dp">
 
         <EditText
-            android:textSize="32dp"
             android:id="@+id/locate_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@null"
             android:hint="@string/search_city"
-            android:textColorHint="#fff" />
+            android:textColorHint="#fff"
+            android:textSize="32dp" />
 
     </FrameLayout>
 
@@ -29,7 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@drawable/list_divider"
-        android:dividerHeight="1px">
+        android:dividerHeight="1px"
+        android:listSelector="@drawable/tmp">
 
     </ListView>
 </LinearLayout>

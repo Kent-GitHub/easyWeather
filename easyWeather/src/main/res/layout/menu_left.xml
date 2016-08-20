@@ -5,22 +5,21 @@
     android:orientation="vertical">
 
     <TextView
-        android:gravity="center_vertical"
         android:id="@+id/st_weather"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:background="#e96e13"
+        android:gravity="center_vertical"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:background="#e96e13"
         android:text="@string/st_weather"
-        android:textSize="32dp"
-        android:textColor="#fff" />
+        android:textColor="#fff"
+        android:textSize="32dp" />
 
     <ListView
         android:id="@+id/stWeather_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:listSelector="@drawable/tmp" />
 
 </LinearLayout>

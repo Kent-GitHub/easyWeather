@@ -129,7 +129,7 @@ public class CodeToValues {
         colorValues.put(101, "e42640");//多云//
         colorValues.put(102, "e42640");//少云//
         colorValues.put(103, "e42640");//晴间多云//
-        colorValues.put(104, "e42640");//阴//
+        colorValues.put(104, "2684e4");//阴//
 
         colorValues.put(200, "2684e4");//有风//浅蓝　2684e4 -
         colorValues.put(201, "2684e4");//平静//

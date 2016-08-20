@@ -46,33 +46,33 @@ public class SimpleWeatherData {
         prediction = new String[]{today.getString(), tomorrow.getString(), afterTomorrow.getString()};
     }
 
-    public SimpleWeatherData(WeatherBean bean) {
-        //设置date// 08.19/周五
-        Date date = bean.getDate();
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        String dateString = (new SimpleDateFormat("MM.dd").format(date) + "/") +
-                formatWeekday(c.get(Calendar.DAY_OF_WEEK));
-        setDate(dateString);
-        //设置location
-        setLocation(bean.getCity());
-        //设置rtWeatherCode
-        setRtWeatherCode(bean.getRtCode());
-        //设置rtDescribe
-        setRtDescribe(bean.getRtDescribe());
-        //设置rtTmp
-        setRtTmp(bean.getRtTmp());
-        //设置dayWeatherCode
-        setDayWeatherCode(bean.getDayCode(0));
-        //设置DayDescribe
-        setDayDescribe(bean.getDayDescribe(0));
-        //设置tmpRange
-        setTmpRange(bean.getTmpRange(0));
-        //设置days
-        days.add(bean.getDailyDate(0));
-        days.add(bean.getDailyDate(1));
-        days.add(bean.getDailyDate(2));
-    }
+//    public SimpleWeatherData(WeatherBean bean) {
+//        //设置date// 08.19/周五
+//        Date date = bean.getDate();
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(date);
+//        String dateString = (new SimpleDateFormat("MM.dd").format(date) + "/") +
+//                formatWeekday(c.get(Calendar.DAY_OF_WEEK));
+//        setDate(dateString);
+//        //设置location
+//        setLocation(bean.getCity());
+//        //设置rtWeatherCode
+//        setRtWeatherCode(bean.getRtCode());
+//        //设置rtDescribe
+//        setRtDescribe(bean.getRtDescribe());
+//        //设置rtTmp
+//        setRtTmp(bean.getRtTmp());
+//        //设置dayWeatherCode
+//        setDayWeatherCode(bean.getDayCode(0));
+//        //设置DayDescribe
+//        setDayDescribe(bean.getDayDescribe(0));
+//        //设置tmpRange
+//        setTmpRange(bean.getTmpRange(0));
+//        //设置days
+//        days.add(bean.getDailyDate(0));
+//        days.add(bean.getDailyDate(1));
+//        days.add(bean.getDailyDate(2));
+//    }
 
     public List<DailyWeatherData> getDays() {
         return days;

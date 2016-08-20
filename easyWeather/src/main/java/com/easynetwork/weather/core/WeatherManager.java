@@ -132,6 +132,12 @@ public class WeatherManager {
         user.lon = longitude + "";
         user.lat = latitude + "";
         requestWeatherData(user);
+
+    }
+
+    public void requestData(City city) {
+        WeatherDateDownloadTask wTask = new WeatherDateDownloadTask(city);
+        wTask.execute();
     }
 
     /**
@@ -318,11 +324,14 @@ public class WeatherManager {
 
         private City mCity;
 
+        public WeatherDateDownloadTask(City city) {
+            mCity = city;
+        }
+
         @Override
         protected SimpleWeatherData doInBackground(City... cities) {
-            City c = cities[0];
-            SimpleWeatherData data;
-            data = nWeatherLoader.getSimpleWeatherData(c.getCity(), c.getLatitude() + "", c.getLongitude() + "");
+            SimpleWeatherData data=null;
+//            data = nWeatherLoader.getSimpleWeatherData(mCity.getCity(), mCity.getLatitude() + "", mCity.getLongitude() + "");
             return data;
         }
 
@@ -378,7 +387,7 @@ public class WeatherManager {
 
             // 保存本地数据
             saveWeatherData(nnUser.uid, weatherWrapper);
-            if (city!=null&&!city.equals("")){
+            if (city != null && !city.equals("")) {
                 weatherWrapper.nUser.city = city;
             }
             return weatherWrapper;

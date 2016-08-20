@@ -164,6 +164,7 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         if (mListView == null) return;
         title.setFocusable(true);
         title.requestFocus();
+
         mListView.getChildAt(0).requestFocus();
     }
 

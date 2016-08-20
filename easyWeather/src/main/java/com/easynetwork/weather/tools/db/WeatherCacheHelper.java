@@ -33,18 +33,18 @@ public class WeatherCacheHelper {
         return mInstance;
     }
 
-    public SimpleWeatherData getDateByCity(String city) {
-        SimpleWeatherData date = null;
-        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery("select * from weather where city like '" + city + "%'", null);
-        if (cursor.moveToNext()) {
-            date = new SimpleWeatherData();
-            String jsonString = cursor.getString(cursor.getColumnIndex("jsonText"));
-            Gson gson = new Gson();
-            WeatherBean weatherBean = gson.fromJson(jsonString, WeatherBean.class);
-            SimpleWeatherData swd=new SimpleWeatherData(weatherBean);
-        }
-        return date;
-    }
+//    public SimpleWeatherData getDateByCity(String city) {
+//        SimpleWeatherData date = null;
+//        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery("select * from weather where city like '" + city + "%'", null);
+//        if (cursor.moveToNext()) {
+//            date = new SimpleWeatherData();
+//            String jsonString = cursor.getString(cursor.getColumnIndex("jsonText"));
+//            Gson gson = new Gson();
+//            WeatherBean weatherBean = gson.fromJson(jsonString, WeatherBean.class);
+//            SimpleWeatherData swd=new SimpleWeatherData(weatherBean);
+//        }
+//        return date;
+//    }
 
     class MyDBHelper extends SQLiteOpenHelper {
         private static final String TABLE_NAME = "weather";

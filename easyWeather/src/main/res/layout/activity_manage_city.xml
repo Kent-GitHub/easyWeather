@@ -12,23 +12,23 @@
         android:paddingRight="10dp">
 
         <TextView
-            android:textSize="32dp"
             android:id="@+id/tv_mng_city"
+            style="@null"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:text="@string/manage_city"
-            style="@null"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:textSize="32dp" />
 
         <Button
             android:id="@+id/add_city"
-            android:text="@string/add"
-            android:textSize="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical" />
+            android:layout_gravity="end|center_vertical"
+            android:text="@string/add"
+            android:textSize="24dp" />
     </FrameLayout>
 
     <ListView
@@ -36,7 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@drawable/list_divider"
-        android:dividerHeight="1px">
+        android:dividerHeight="1px"
+        android:listSelector="@drawable/tmp">
 
     </ListView>
 

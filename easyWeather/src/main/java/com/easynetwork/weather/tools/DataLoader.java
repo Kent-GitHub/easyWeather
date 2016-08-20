@@ -28,6 +28,8 @@ import com.google.gson.Gson;
 public class DataLoader {
     private final static String TAG = "WeatherLoader";
 
+
+
     public WeatherWrapper getWeatherData(String latitude, String longitude) {
         long time = System.currentTimeMillis() / 1000;
         WeatherWrapper wrapper = new WeatherWrapper();
@@ -60,38 +62,38 @@ public class DataLoader {
         return wrapper;
     }
 
-    public SimpleWeatherData getSimpleWeatherData(String latitude, String longitude) {
-        return getSimpleWeatherData(null, latitude, longitude);
-    }
+//    public SimpleWeatherData getSimpleWeatherData(String latitude, String longitude) {
+//        return getSimpleWeatherData(null, latitude, longitude);
+//    }
 
-    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
-        SimpleWeatherData data = null;
-        long time = System.currentTimeMillis() / 1000;
-        String jsonResult = "";
-        // TODO: 2016/8/16 更换查询接口
-        String httpUrl;
-        if (useURL1) {
-            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
-        } else {
-            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
-        }
-        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
-        jsonResult = request(httpUrl);
-        if (jsonResult == null) {
-            return null;
-        }
-        Gson gson = new Gson();
-        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
-        if (!bean.getErrNum().equals("200")) {
-            return null;
-        }
-        if (city != null) {
-            bean.setCity(city);
-        }
-        String jsonString = gson.toJson(bean);
-        data = new SimpleWeatherData(bean);
-        return data;
-    }
+//    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
+//        SimpleWeatherData data = null;
+//        long time = System.currentTimeMillis() / 1000;
+//        String jsonResult = "";
+//        // TODO: 2016/8/16 更换查询接口
+//        String httpUrl;
+//        if (useURL1) {
+//            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+//        } else {
+//            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+//        }
+//        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
+//        jsonResult = request(httpUrl);
+//        if (jsonResult == null) {
+//            return null;
+//        }
+//        Gson gson = new Gson();
+//        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+//        if (!bean.getErrNum().equals("200")) {
+//            return null;
+//        }
+//        if (city != null) {
+//            bean.setCity(city);
+//        }
+//        String jsonString = gson.toJson(bean);
+//        data = new SimpleWeatherData(bean);
+//        return data;
+//    }
 
     private boolean useURL1;
 

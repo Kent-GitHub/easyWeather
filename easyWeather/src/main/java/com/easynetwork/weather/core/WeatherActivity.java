@@ -153,39 +153,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         }
     };
 
-    BroadcastReceiver locationReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("com.pingyijinren.location.ACTION_RETURN_LOCATION")) {
-                Bundle data = intent.getExtras();
-                //1表示定位成功，2表示定位失败:定位失败则只有errorCode和errorMsg信息，不会有其他信息；定位成功则返回全部信息
-                int errorCode = data.getInt("errorCode");
-                String errorMsg = data.getString("errorMsg");//错误信息
-                android.util.Log.e(TAG, "onReceive_errorCode: " + errorCode);
-                double longitude = data.getDouble("longitude", 113.7582310001);//经度
-                double latitude = data.getDouble("latitude", 23.0269970000);//纬度
-
-                String city = data.getString("city");//城市
-                String province = data.getString("province");
-                String district = data.getString("district");
-
-                if (errorCode == 1 && nWeatherManager != null) {
-                    User user = new User();
-                    user.city = city;
-                    user.lon = String.valueOf(longitude);
-                    user.lat = String.valueOf(latitude);
-                    String[] params = {"city", "province", "district",};
-                    String[] params2 = {city, province, district};
-                    user.location = JsonUtil.createJSON("location", params, params2);
-                    nWeatherManager.setLocalUser(user);
-
-                    //更新当前位置数据
-                    nWeatherManager.requestData();
-                }
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // 初始化资源索引
@@ -233,12 +200,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(nNetReceiver, filter);
 
-        // 有网络执行定位
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.pingyijinren.location.ACTION_RETURN_LOCATION");
-        // 注册广播接收器
-        registerReceiver(locationReceiver, intentFilter);
-
         nIsFamilyList = false;
         nWeatherManager.setLoadListener(this);
 
@@ -254,6 +215,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             long rtTimeStamp = System.currentTimeMillis() / 1000;
             long timeStamp = weatherData.getTimeStamp();
             if (rtTimeStamp - timeStamp > 3 * 60 * 60) {
+                // TODO: 2016/8/20 未切换加载方法
                 nWeatherManager.requestData();
             } else {
                 if (ttsOn) {
@@ -424,7 +386,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         super.onDestroy();
         try {
             unregisterReceiver(nNetReceiver);
-            unregisterReceiver(locationReceiver);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             e.printStackTrace();
@@ -498,6 +459,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         int locType = bdLocation.getLocType();
         if (locType != 61 && locType != 66 && locType != 161) {
             Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
+            if (refreshAfterLocated) {
+                hideTipsView();
+            }
             return;
         }
         android.util.Log.e(TAG, "onReceiveLocation: succeed");
@@ -507,9 +471,12 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         String currentCity = bdLocation.getAddress().city;
         WeatherApplication.setCurrentCity(currentCity);
         if (currentCity != null && !"".equals(currentCity)) {
-            WeatherApplication.setLocatedCity(new City(currentCity, latitude, longitude));
+            City c = new City(currentCity, latitude, longitude);
+            WeatherApplication.setLocatedCity(c);
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
+                // TODO: 2016/8/20 切换请求方法
                 nWeatherManager.requestData(latitude, longitude);
+//                nWeatherManager.requestData(c);
             }
         }
         SharedPreUtil.setGlobalVar(this, "user_lon", longitude + "");
@@ -529,7 +496,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         SharedPreUtil.setGlobalVar(this, "user_city", city.getCity());
         showTipsView();
         //nWeatherManager.requestData(true);
-        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
+        //// TODO: 2016/8/20 切换请求方法
+//        nWeatherManager.requestData(city);
+        nWeatherManager.requestData( city.getCity(),city.getLatitude(), city.getLongitude());
     }
 
     @Override

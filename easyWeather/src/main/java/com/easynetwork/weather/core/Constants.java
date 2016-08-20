@@ -16,4 +16,5 @@ public class Constants {
 	public static final String WEATHER_REMIND_STATE_URL= "http://mobile.pingyijinren.com/family/photo/getWeatherRcd?v=1.0";
 	/** SD缓存文件夹名称*/
 	public final static String SD_FOLDER_PATH = "/pingyijinren/EasyWeather/";
+
 }
