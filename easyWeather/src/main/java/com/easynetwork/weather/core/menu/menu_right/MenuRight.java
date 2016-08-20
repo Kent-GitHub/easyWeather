@@ -165,22 +165,18 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         title.setFocusable(true);
         title.requestFocus();
 
+        mListView.getChildAt(0).setSelected(true);
         mListView.getChildAt(0).requestFocus();
+
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.e(TAG, "onItemClick: ");
         if (i == 0) {
             Intent intent = new Intent(mContext, ManageCityActivity.class);
             mContext.startActivity(intent);
         } else if (i == 1) {
             buttonSwitch((Switch) view.findViewById(R.id.f_toggle));
-        } else if (i == 2) {
-            WeatherManager weatherManager = WeatherManager.getInstance();
-            if (weatherManager != null) {
-                weatherManager.requestData();
-            }
         }
     }
 

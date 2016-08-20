@@ -550,7 +550,7 @@ public class WeatherBean {
         if (day > MAX_DAY - 1) return null;
         String max = getData().getDaily_forecast().get(day).getTmp().getMax();
         String min = getData().getDaily_forecast().get(day).getTmp().getMin();
-        return max + "~" + min + "°C";
+        return min + "~" + max + "°C";
     }
 
     public long getTimeStamp() {

@@ -8,7 +8,6 @@ import com.easynetwork.weather.tools.Log;
 import com.easynetwork.weather.tools.network.NetworkUtil;
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
-import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.tools.StatusBarUtils;
 import com.easynetwork.weather.tools.TextSpeakControl;
 import com.easynetwork.weather.tools.ToastUtil;
@@ -24,13 +23,8 @@ import com.easynetwork.weather.view.SimpleWeatherView;
 import com.easynetwork.weather.R;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -53,10 +47,8 @@ import me.tangke.slidemenu.SlideMenu;
 public class WeatherActivity extends Activity implements WeatherManager.DataLoadListener,
         SlideMenu.OnSlideStateChangeListener, BDLocationListener, View.OnClickListener {
 
-    private final static String TAG = "WeatherActivityMYMY";
+    private final static String TAG = "WeatherActivity";
     private final static boolean log2file = true;
-    private int RESULT_PHONE_BAND_CODE = 1;
-
     private final static int Status_Left = 0x101;
     private final static int Status_Right = 0x102;
     private final static int Status_Normal = 0x103;
@@ -69,28 +61,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
      * 天气数据下载等管理器
      */
     private WeatherManager nWeatherManager;
-
-    /**
-     * 一个本地的数据
-     */
-    @SuppressWarnings("unused")
-    private WeatherWrapper nWeatherWrapper;
-
-    /**
-     * 正在显示谁的天气数据
-     */
-    private User nCurrentUser;
-    /**
-     * 当前是不是显示的list
-     */
-    @SuppressWarnings("unused")
-    private boolean nIsFamilyList;
-
-    /**
-     * list界面回来保持scroll位置不变
-     */
-    @SuppressWarnings("unused")
-    private Point nListPosition;
 
     /**
      * 左边抽屉
@@ -108,49 +78,10 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
      * 主界面以及两边抽屉
      */
     private SlideMenu mSlideMenu;
-
-    private TextSpeakControl ttsControl;
-
     /**
-     * 是否正在提醒
+     * 语音播报实例
      */
-    private boolean isReminding = false;
-
-    // 网络变化变化时的广播接收器
-    private BroadcastReceiver nNetReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.w(TAG, "onReceive");
-
-            // 收到的广播是否是CONNECTIVITY_ACTION
-            if (action != null && action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                Log.w(TAG, "网络状态已经改变");
-                if (nWeatherManager == null) {
-                    return;
-                }
-                if (nCurrentUser != null) {
-
-                }
-                // 得到目前的网络类型
-                Network type = NetworkUtil.getCurrentNetwork(context);
-                Log.w(TAG, "network type = " + type.name());
-
-                // 目前有网络，请求数据
-                if (type.ordinal() < Network.NT_NONE.ordinal() && nCurrentUser != null) {
-                    if (SharedPreUtil.getGlobalVar(WeatherActivity.this, "user_uid", "local").equals(nCurrentUser.uid)) {//本身用户
-                        Intent locationIntent = new Intent("com.pingyijinren.location.ACTION_GET_LOCATION");
-                        // 加上标志，避免定位应用安装后从来没有启动过和被用户手动强制停止后无法接收到
-                        locationIntent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                        sendBroadcast(locationIntent);
-                    } else {//亲友用户
-                        nWeatherManager.requestWeatherData(nCurrentUser);
-                    }
-                }
-            }
-        }
-    };
+    private TextSpeakControl ttsControl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,50 +107,41 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
                 SlideMenu.LayoutParams.MATCH_PARENT, SlideMenu.LayoutParams.ROLE_SECONDARY_MENU));
         mSlideMenu.setOnSlideStateChangeListener(this);
 
-        // 设置天气界面按钮监听
         ttsControl = new TextSpeakControl(this);
         // 初始化管理器
         nWeatherManager = WeatherManager.createManager(this);
-        nCurrentUser = nWeatherManager.getLocalUser();
-        nListPosition = new Point();
+        nWeatherManager.setLoadListener(this);
 
-//        initWeather();
-        initSimpleWeather();
+        //加载本地数据或请求网络数据
+        initWeather();
 
-        android.util.Log.e(TAG, "onCreate: ");
+        //初始化定位
         mLocationClient = new LocationClient(getApplicationContext());
         initLocation();
         mLocationClient.registerLocationListener(this);
         mLocationClient.start();
 
-        // 网络时间广播监听
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(nNetReceiver, filter);
-
-        nIsFamilyList = false;
-        nWeatherManager.setLoadListener(this);
-
     }
 
+    /**
+     * 定位成功后按定位地点进行刷新
+     */
     private boolean refreshAfterLocated;
-    private City currentCity;
+    /**
+     * 定位成功后的City
+     */
     private City locatedCity;
 
-    private void initSimpleWeather() {
+    private void initWeather() {
         String city = null;
         long timeStamp;
         double latitude;
         double longitude;
         String json = null;
+        City currentCity;
         try {
             city = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_CITY);
-            timeStamp = Long.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_STAMP));
-            latitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LATITUDE));
-            longitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE));
             json = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_JSON);
-            android.util.Log.e(TAG, "getSimpleWeatherData: got it");
-            currentCity = new City(city, latitude, longitude);
         } catch (Exception e) {
             requestAfterLocated();
             e.printStackTrace();
@@ -231,51 +153,37 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             return;
         }
         long nowStamp = System.currentTimeMillis() / 1000;
-
+        timeStamp = Long.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_STAMP));
+        latitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LATITUDE));
+        longitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE));
+        currentCity = new City(city, latitude, longitude);
         if (nowStamp - timeStamp > Constants.refreshInterval) {
+            showTipsView();
             nWeatherManager.requestData(currentCity);
+            android.util.Log.e(TAG, "Load weather data is out of time,request weather data again.");
             return;
         }
-        android.util.Log.e(TAG, "set date form local");
         SimpleWeatherData data = JsonUtil.jsonToSWD(json);
         mWeatherView.setSimpleWeatherData(data);
         mMenuLeft.setSimpleDatas(data);
+        if (ttsOn) {
+            ttsControl.speakAfterTTSReady(data.getSpeakText());
+        }
+        android.util.Log.e(TAG, "Load weather data from local succeeded.");
     }
 
+    /**
+     * 已定位则直接请求数据，未定位设置标志位并等待定位成功后刷新
+     */
     private void requestAfterLocated() {
+        showTipsView();
         if (!isLocated) {
             refreshAfterLocated = true;
+            android.util.Log.e(TAG, "should request weather after located.");
             return;
         }
         nWeatherManager.requestData(locatedCity);
-    }
-
-
-    private void initWeather() {
-        SimpleWeatherData weatherData = SharedPreUtil.getWeatherData(this);
-        if (weatherData != null && !weatherData.getLocation().equals("")) {
-            mWeatherView.setWeatherData(weatherData);
-            mMenuLeft.setDatas(weatherData);
-            long rtTimeStamp = System.currentTimeMillis() / 1000;
-            long timeStamp = weatherData.getTimeStamp();
-            if (rtTimeStamp - timeStamp > 3 * 60 * 60) {
-                // TODO: 2016/8/20 未切换加载方法
-                android.util.Log.e(TAG, "initWeather: requestData1");
-                nWeatherManager.requestData();
-            } else {
-                if (ttsOn) {
-                    ttsControl.speakAfterTTSReady(weatherData.getSpeakText());
-                }
-            }
-        } else {
-            android.util.Log.e(TAG, "initWeather: " + (weatherData == null));
-            if (weatherData != null) {
-                android.util.Log.e(TAG, "initWeather: " + weatherData.getLocation());
-            }
-            refreshAfterLocated = true;
-            showTipsView();
-            //updateWeatherAfterLocated();
-        }
+        android.util.Log.e(TAG, "request weather ,it's located already.");
     }
 
     private void initLocation() {
@@ -296,18 +204,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         mLocationClient.setLocOption(option);
     }
 
-    private void showListView() {
-        Log.w(TAG, "showListView()");
-
-        //nRootView.setBackgroundColor(Color.WHITE);
-//        nScrollView.scrollTo(0, 0);
-//        nScrollView.removeAllViews();
-//        nScrollView.addView(nListView);
-
-        nCurrentUser = null;
-        nIsFamilyList = true;
-    }
-
     private RelativeLayout contentView;
 
     @Override
@@ -315,31 +211,8 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
     }
 
-
     @Override
-    public void onWeatherDataLoaded(WeatherWrapper data) {
-        // 有weather数据下载
-        if (nCurrentUser == null || !data.done) {
-            return;
-        }
-        refreshAfterLocated = false;
-        mWeatherView.setWeatherData(data);
-        mMenuLeft.setDatas(data);
-        SharedPreUtil.saveWeatherData(this, data);
-        if (mWeatherView.getParent() == null) {
-            contentView.removeAllViews();
-            contentView.addView(mWeatherView);
-        }
-        hideTipsView();
-        if (ttsOn) {
-            ttsControl.speak("天气刷新成功," + new SimpleWeatherData(data).getSpeakText());
-        }
-
-
-    }
-
-    @Override
-    public void onSimpleWeatherDataLoaded(SimpleWeatherData data) {
+    public void onWeatherDataLoaded(SimpleWeatherData data) {
         if (data == null || mWeatherView == null) return;
         refreshAfterLocated = false;
         mWeatherView.setSimpleWeatherData(data);
@@ -416,7 +289,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     protected void onResume() {
         super.onResume();
-        android.util.Log.e(TAG, "onResume: ");
     }
 
     @Override
@@ -430,12 +302,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            unregisterReceiver(nNetReceiver);
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
-            e.printStackTrace();
-        }
+
 
         if (nWeatherManager != null) {
             nWeatherManager.destory();
@@ -518,37 +385,28 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         }
         //定位成功处理
         isLocated = true;
-        android.util.Log.e(TAG, "onReceiveLocation: succeed");
         double latitude = bdLocation.getLatitude();
         double longitude = bdLocation.getLongitude();
         String currentCity = bdLocation.getAddress().city;
+        android.util.Log.e(TAG, "onReceiveLocation succeed located to :" + currentCity);
         WeatherApplication.setCurrentCity(currentCity);
         if (currentCity != null && !"".equals(currentCity)) {
             locatedCity = new City(currentCity, latitude, longitude);
             WeatherApplication.setLocatedCity(locatedCity);
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
                 nWeatherManager.requestData(locatedCity);
+                android.util.Log.e(TAG, "located already,request weather date now.");
             }
         }
-        SharedPreUtil.setGlobalVar(this, "user_lon", longitude + "");
-        SharedPreUtil.setGlobalVar(this, "user_lat", latitude + "");
-        SharedPreUtil.setGlobalVar(this, "user_city", bdLocation.getAddress().city);
     }
 
     private void updateWeatherByCity(City city) {
         if (city.getCity() == null) {
-            showTipsView();
             requestAfterLocated();
         }
-        android.util.Log.e(TAG, "updateWeatherByCity: " + city.getCity() + "_" + city.getLatitude() + "_" + city.getLongitude());
-        SharedPreUtil.setGlobalVar(this, "user_lon", city.getLongitude() + "");
-        SharedPreUtil.setGlobalVar(this, "user_lat", city.getLatitude() + "");
-        SharedPreUtil.setGlobalVar(this, "user_city", city.getCity());
         showTipsView();
-        //// TODO: 2016/8/20 切换请求方法
-        android.util.Log.e(TAG, "updateWeatherByCity: requestData3");
         nWeatherManager.requestData(city);
-//        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
+        android.util.Log.e(TAG, "request weather data form an intent click.");
     }
 
     @Override
