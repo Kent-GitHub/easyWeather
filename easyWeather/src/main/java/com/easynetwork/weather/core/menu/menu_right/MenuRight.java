@@ -178,7 +178,7 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         } else if (i == 2) {
             WeatherManager weatherManager = WeatherManager.getInstance();
             if (weatherManager != null) {
-                weatherManager.requestData(true);
+                weatherManager.requestData();
             }
         }
     }

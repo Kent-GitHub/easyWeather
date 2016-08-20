@@ -4,6 +4,7 @@ import com.easynetwork.weather.R;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
@@ -37,7 +38,8 @@ public class ViewUtil {
 		
 		TextView tipView = new TextView(context);
 		tipView.setTextSize(23.f);
-		tipView.setTextColor(context.getResources().getColor(R.color.black_4d4d4d));
+//		tipView.setTextColor(context.getResources().getColor(R.color.black_4d4d4d));
+        tipView.setTextColor(Color.parseColor("#ffffff"));
 		tipView.setGravity(Gravity.CENTER);
 		tipView.setLineSpacing(0, 1.25f);
 		tipView.setText(Html.fromHtml("正在打开，请稍候"));
@@ -62,7 +64,8 @@ public class ViewUtil {
 		
 		TextView tipView = new TextView(context);
 		tipView.setTextSize(23.f);
-		tipView.setTextColor(context.getResources().getColor(R.color.black_4d4d4d));
+//		tipView.setTextColor(context.getResources().getColor(R.color.black_4d4d4d));
+        tipView.setTextColor(Color.parseColor("#ffffff"));
 		tipView.setGravity(Gravity.CENTER);
 		tipView.setLineSpacing(0, 1.25f);
 		tipView.setText("网络未连接\n请打开无线网络或数据流量");
@@ -91,7 +94,8 @@ public class ViewUtil {
 		//文字描述
 		TextView tipView = new TextView(context);
 		tipView.setTextSize(22.f);
-		tipView.setTextColor(context.getResources().getColor(R.color.gray_999999));
+//		tipView.setTextColor(context.getResources().getColor(R.color.gray_999999));
+		tipView.setTextColor(Color.parseColor("#ffffff"));
 		tipView.setGravity(Gravity.CENTER);
 		tipView.setLineSpacing(0, 1.25f);
 		tipView.setText(Html.fromHtml("网络连接失败，再试一次吧"));
@@ -104,7 +108,8 @@ public class ViewUtil {
 		//再试一次按钮
 		TextView buttonView = new TextView(context);
 		buttonView.setTextSize(26.f);
-		buttonView.setTextColor(context.getResources().getColor(R.color.black_787878));
+//		buttonView.setTextColor(context.getResources().getColor(R.color.black_787878));
+        tipView.setTextColor(Color.parseColor("#ffffff"));
 		buttonView.setClickable(true);
 		//buttonView.setBackgroundResource(R.drawable.selector_request_again_button);
 		buttonView.setBackgroundResource(R.drawable.btn_network_large);

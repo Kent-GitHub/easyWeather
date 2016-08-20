@@ -180,7 +180,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
                     nWeatherManager.setLocalUser(user);
 
                     //更新当前位置数据
-                    nWeatherManager.requestData(true);
+                    nWeatherManager.requestData();
                 }
             }
         }
@@ -254,7 +254,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             long rtTimeStamp = System.currentTimeMillis() / 1000;
             long timeStamp = weatherData.getTimeStamp();
             if (rtTimeStamp - timeStamp > 3 * 60 * 60) {
-                nWeatherManager.requestData(true);
+                nWeatherManager.requestData();
             } else {
                 if (ttsOn) {
                     ttsControl.speakAfterTTSReady(weatherData.getSpeakText());
@@ -268,31 +268,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             refreshAfterLocated = true;
             showTipsView();
             //updateWeatherAfterLocated();
-        }
-    }
-
-    private void updateWeatherAfterLocated() {
-        if (isLocated) {
-            nWeatherManager.requestData(true);
-        } else {
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        while (!isLocated) {
-                            Thread.sleep(3000);
-                        }
-                        WeatherActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                nWeatherManager.requestData(true);
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
         }
     }
 
@@ -534,7 +509,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         if (currentCity != null && !"".equals(currentCity)) {
             WeatherApplication.setLocatedCity(new City(currentCity, latitude, longitude));
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
-                nWeatherManager.requestData(true);
+                nWeatherManager.requestData(latitude, longitude);
             }
         }
         SharedPreUtil.setGlobalVar(this, "user_lon", longitude + "");
