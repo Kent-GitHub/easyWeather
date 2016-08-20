@@ -190,6 +190,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             //获取缓存天气数据或从网络获取数据
             initWeather();
         }
+        android.util.Log.e(TAG, "onCreate: ");
         mLocationClient = new LocationClient(getApplicationContext());
         initLocation();
         mLocationClient.registerLocationListener(this);
@@ -371,6 +372,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     protected void onResume() {
         super.onResume();
+        android.util.Log.e(TAG, "onResume: ");
     }
 
     @Override
@@ -400,6 +402,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         }
         if (ttsControl != null) {
             ttsControl.closeTts();
+        }
+        if (mLocationClient != null && mLocationClient.isStarted()) {
+            mLocationClient.stop();
         }
     }
 
@@ -449,6 +454,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         this.ttsOn = ttsOn;
     }
 
+
     /**
      * 是否已经定位
      */
@@ -458,8 +464,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     public void onReceiveLocation(BDLocation bdLocation) {
         int locType = bdLocation.getLocType();
         if (locType != 61 && locType != 66 && locType != 161) {
-            Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
-            if (refreshAfterLocated) {
+            android.util.Log.e(TAG, "onReceiveLocation: " + locType);
+            ToastUtil.showText(this, "定位失败");
+            if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
                 hideTipsView();
             }
             return;
@@ -498,7 +505,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         //nWeatherManager.requestData(true);
         //// TODO: 2016/8/20 切换请求方法
 //        nWeatherManager.requestData(city);
-        nWeatherManager.requestData( city.getCity(),city.getLatitude(), city.getLongitude());
+        nWeatherManager.requestData(city.getCity(), city.getLatitude(), city.getLongitude());
     }
 
     @Override

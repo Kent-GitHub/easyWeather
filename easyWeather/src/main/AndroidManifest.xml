@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.easynetwork.weather"
-    android:versionCode="05"
-    android:versionName="1.0.05.20160820">
+    android:versionCode="34"
+    android:versionName="1.0.04.20160820">
     <!--android:versionName="1.1.33.20160616"-->
     <uses-sdk
         android:minSdkVersion="18"
