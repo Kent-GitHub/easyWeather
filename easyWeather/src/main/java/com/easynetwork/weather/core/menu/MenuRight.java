@@ -1,4 +1,4 @@
-package com.easynetwork.weather.core.menu.menu_right;
+package com.easynetwork.weather.core.menu;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,10 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
+import com.easynetwork.weather.core.ManageCityActivity;
 import com.easynetwork.weather.core.WeatherActivity;
-import com.easynetwork.weather.core.WeatherManager;
 import com.easynetwork.weather.R;
 
 import java.util.ArrayList;

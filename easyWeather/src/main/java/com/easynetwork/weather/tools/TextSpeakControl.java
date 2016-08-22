@@ -41,9 +41,8 @@ public class TextSpeakControl {
                     }
                 }
             }
-        }, "com.iflytex.tts");
+        }, "com.iflytek.tts");
     }
-
 
     public void speak(String text) {
         Log.e(TAG, "speak: " + text);

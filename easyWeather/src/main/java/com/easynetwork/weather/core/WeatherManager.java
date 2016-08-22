@@ -1,19 +1,22 @@
 package com.easynetwork.weather.core;
 
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
+import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
 import com.easynetwork.weather.bean.SimpleWeatherData;
+import com.easynetwork.weather.bean.WeatherBean;
 import com.easynetwork.weather.tools.Log;
-import com.easynetwork.weather.bean.User;
-import com.easynetwork.weather.tools.DataLoader;
 import com.easynetwork.weather.tools.SharedPreUtil;
-import com.easynetwork.weather.view.SimpleWeatherView;
+import com.google.gson.Gson;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 
 /**
  * 单例模式<br>
@@ -30,10 +33,6 @@ public class WeatherManager {
      */
     private static WeatherManager instance;
 
-    public static WeatherManager getInstance() {
-        return instance;
-    }
-
     public static WeatherManager createManager(Context context) {
         if (instance != null) {
             return instance;
@@ -44,44 +43,25 @@ public class WeatherManager {
         return instance;
     }
 
-    /**
-     * 上下文
-     */
-    private Context nContext;
-    /**
-     * 本地的账号
-     */
-    private User nLocalUser;
+    private Context mContext;
+
     /**
      * 数据下载成功通知
      */
     private DataLoadListener nDataLoadListener;
-    /**
-     * 数据请求工具
-     */
-    private DataLoader nWeatherLoader;
-    /**
-     * 在下载的时候，界面层是不知道数据是否下载完成或者成功。<br>
-     * 有时候进入界面的时候，要去询问是否正在下载，因此，这里保存这个值
-     */
-    private HashMap<String, Boolean> nIsLoadingFlags;
 
     /**
      * 构造函数，初始化，检测文件过期，注册监听
-     *
-     * @param context
      */
     @SuppressLint("ServiceCast")
     public WeatherManager(Context context) {
-        this.nContext = context;
-        nWeatherLoader = new DataLoader();
-        nIsLoadingFlags = new HashMap<String, Boolean>();
+        mContext = context;
     }
 
     /**
      * 注销，必须，因为有监听
      */
-    public void destory() {
+    public void destroy() {
         instance = null;
     }
 
@@ -93,8 +73,6 @@ public class WeatherManager {
 
     /**
      * 数据下载监听器
-     *
-     * @param listener
      */
     public void setLoadListener(DataLoadListener listener) {
         nDataLoadListener = listener;
@@ -106,7 +84,7 @@ public class WeatherManager {
      * @author WenYF
      */
     interface DataLoadListener {
-        void onWeatherDataStartLoad(User user);
+        void onWeatherDataStartLoad();
 
         void onWeatherDataLoaded(SimpleWeatherData data);
     }
@@ -122,7 +100,7 @@ public class WeatherManager {
         @Override
         protected SimpleWeatherData doInBackground(City... cities) {
             SimpleWeatherData data;
-            data = nWeatherLoader.getSimpleWeatherData(mCity.getCity(), mCity.getLatitude() + "", mCity.getLongitude() + "");
+            data = getSimpleWeatherData(mCity.getCity(), mCity.getLatitude() + "", mCity.getLongitude() + "");
             return data;
         }
 
@@ -131,4 +109,90 @@ public class WeatherManager {
             nDataLoadListener.onWeatherDataLoaded(simpleWeatherData);
         }
     }
+
+    public SimpleWeatherData getSimpleWeatherData(String city, String latitude, String longitude) {
+        SimpleWeatherData data;
+        long time = System.currentTimeMillis() / 1000;
+        String jsonResult;
+        // TODO: 2016/8/16 更换查询接口
+        String httpUrl;
+        if (useURL1) {
+            httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        } else {
+            httpUrl = Constants.WEATHER_DATA_URL + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
+        }
+        android.util.Log.d(TAG, "getSimpleWeatherData_httpUrl: " + httpUrl);
+        jsonResult = request(httpUrl);
+        if (jsonResult == null) {
+            return null;
+        }
+
+        int start = jsonResult.indexOf("{");
+        if (start == -1) return null;
+        jsonResult = jsonResult.substring(start);
+
+
+        Gson gson = new Gson();
+        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+
+        if (!bean.getErrNum().equals("200")) {
+            android.util.Log.e(TAG, "getSimpleWeatherData_ErrNum(): " + bean.getErrNum());
+            return null;
+        }
+        if (city != null) {
+            bean.setCity(city);
+        }
+        String jsonString = gson.toJson(bean);
+        String stamp = System.currentTimeMillis() / 1000 + "";
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_JSON, jsonString);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_LATITUDE, latitude);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE, longitude);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_STAMP, stamp);
+        SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_CITY, city);
+        android.util.Log.e(TAG, "getSimpleWeatherData: saved");
+        data = new SimpleWeatherData(bean);
+        data.setResultCode(resultCode);
+        return data;
+    }
+
+    private boolean useURL1 = false;
+
+    private int resultCode;
+
+    /**
+     * 请求一个url，并得到json数据
+     *
+     * @param httpUrl url
+     * @return 数据
+     */
+    private String request(String httpUrl) {
+        BufferedReader reader;
+        String result;
+        StringBuilder sbf = new StringBuilder();
+        try {
+            URL url = new URL(httpUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            InputStream is = connection.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String strRead;
+            while ((strRead = reader.readLine()) != null) {
+                sbf.append(strRead);
+                sbf.append("\r\n");
+            }
+            resultCode = connection.getResponseCode();
+            android.util.Log.e(TAG, "request result with code:" + resultCode + ",describe:" + connection.getResponseMessage());
+            if (connection.getResponseCode() == 304) {
+                return null;
+            }
+            reader.close();
+            result = sbf.toString();
+        } catch (Exception e) {
+            result = null;
+            Log.e(TAG, "request error : " + e.toString(), e);
+        }
+        return result;
+    }
+
 }

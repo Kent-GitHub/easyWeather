@@ -11,8 +11,7 @@ public class WeatherApplication extends Application {
 
     private static int screenWidth;
     private static int screenHeight;
-    private static String currentCity = "未知";
-    private static City selectedCity;
+    private static City currentCity;
     private static City locatedCity;
 
 
@@ -39,26 +38,19 @@ public class WeatherApplication extends Application {
         return screenHeight;
     }
 
-    public static String getCurrentCity() {
-        return currentCity;
-    }
-
-    public static void setCurrentCity(String currentCity) {
-        if (currentCity == null) currentCity = "未知";
-        WeatherApplication.currentCity = currentCity;
-    }
-
     public static int dip2px(Context context, float dipValue) {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale);
     }
 
-    public static City getSelectedCity() {
-        return selectedCity;
+
+
+    public static City getCurrentCity() {
+        return currentCity;
     }
 
-    public static void setSelectedCity(City selectedCity) {
-        WeatherApplication.selectedCity = selectedCity;
+    public static void setCurrentCity(City currentCity) {
+        WeatherApplication.currentCity = currentCity;
     }
 
     public static City getLocatedCity() {

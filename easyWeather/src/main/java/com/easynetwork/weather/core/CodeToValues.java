@@ -1,4 +1,4 @@
-package com.easynetwork.weather.core.menu.menu_right;
+package com.easynetwork.weather.core;
 
 import android.graphics.Color;
 

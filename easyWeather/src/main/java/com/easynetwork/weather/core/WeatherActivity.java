@@ -14,21 +14,25 @@ import com.easynetwork.weather.tools.ToastUtil;
 import com.easynetwork.weather.tools.ViewUtil;
 import com.easynetwork.weather.tools.network.Network;
 import com.easynetwork.weather.bean.SimpleWeatherData;
-import com.easynetwork.weather.bean.User;
-import com.easynetwork.weather.core.menu.menu_left.MenuLeft;
-import com.easynetwork.weather.core.menu.menu_right.MenuRight;
+import com.easynetwork.weather.core.menu.MenuLeft;
+import com.easynetwork.weather.core.menu.MenuRight;
 import com.easynetwork.weather.tools.JsonUtil;
 import com.easynetwork.weather.tools.SharedPreUtil;
 import com.easynetwork.weather.view.SimpleWeatherView;
 import com.easynetwork.weather.R;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import me.tangke.slidemenu.SlideMenu;
 
@@ -39,10 +43,9 @@ import me.tangke.slidemenu.SlideMenu;
  * 开发模式是单例管理和MVC的混合模式<br>
  * 数据来源采用有则显示，没有用默认。数据改变，界面立即改变<br>
  * {@link WeatherManager}承担着一切数据管理角色，这里activity则是一个可以观察的窗口来和用户进行交互。<br>
- * 如果有任何不明白，请发邮件到 {@email bludawn@foxmail.com}<br>
+ * 如果有任何不明白，请发邮件到 {bludawn@foxmail.com}<br>
  *
  * @author WenYF
- * @date 2015/9/10
  */
 public class WeatherActivity extends Activity implements WeatherManager.DataLoadListener,
         SlideMenu.OnSlideStateChangeListener, BDLocationListener, View.OnClickListener {
@@ -83,6 +86,8 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
      */
     private TextSpeakControl ttsControl;
 
+    private boolean isSilence;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // 初始化资源索引
@@ -106,6 +111,13 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         mSlideMenu.addView(mMenuRight, new SlideMenu.LayoutParams((int) (WeatherApplication.getScreenWidth() * 0.8),
                 SlideMenu.LayoutParams.MATCH_PARENT, SlideMenu.LayoutParams.ROLE_SECONDARY_MENU));
         mSlideMenu.setOnSlideStateChangeListener(this);
+        //初始化&监听情景模式
+        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int ringerMode = audio.getRingerMode();
+        if (ringerMode == AudioManager.RINGER_MODE_SILENT) isSilence = true;
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
+        registerReceiver(mRingerModeReceiver, intentFilter);
 
         ttsControl = new TextSpeakControl(this);
         // 初始化管理器
@@ -133,40 +145,42 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private City locatedCity;
 
     private void initWeather() {
-        String city = null;
+        String city;
         long timeStamp;
         double latitude;
         double longitude;
-        String json = null;
+        String json ;
         City currentCity;
         try {
             city = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_CITY);
             json = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_JSON);
+            if (city == null || city.equals("") || json == null || json.equals("")) {
+                requestAfterLocated();
+                return;
+            }
+            timeStamp = Long.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_STAMP));
+            latitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LATITUDE));
+            longitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE));
         } catch (Exception e) {
-            requestAfterLocated();
             e.printStackTrace();
+            requestAfterLocated();
             return;
         }
 
-        if (city == null || city.equals("") || json == null || json.equals("")) {
-            requestAfterLocated();
-            return;
-        }
+
         long nowStamp = System.currentTimeMillis() / 1000;
-        timeStamp = Long.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_STAMP));
-        latitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LATITUDE));
-        longitude = Double.valueOf(SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_LONGITUDE));
+
         currentCity = new City(city, latitude, longitude);
         if (nowStamp - timeStamp > Constants.refreshInterval) {
             showTipsView();
             nWeatherManager.requestData(currentCity);
-            android.util.Log.e(TAG, "Load weather data is out of time,request weather data again.");
+            android.util.Log.e(TAG, "Loaded weather data is out of time,request weather data again.");
             return;
         }
         SimpleWeatherData data = JsonUtil.jsonToSWD(json);
         mWeatherView.setSimpleWeatherData(data);
         mMenuLeft.setSimpleDatas(data);
-        if (ttsOn) {
+        if (ttsOn && !isSilence) {
             ttsControl.speakAfterTTSReady(data.getSpeakText());
         }
         android.util.Log.e(TAG, "Load weather data from local succeeded.");
@@ -207,13 +221,18 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private RelativeLayout contentView;
 
     @Override
-    public void onWeatherDataStartLoad(User user) {
+    public void onWeatherDataStartLoad() {
 
     }
 
     @Override
     public void onWeatherDataLoaded(SimpleWeatherData data) {
-        if (data == null || mWeatherView == null) return;
+        if (data == null || mWeatherView == null) {
+            Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
+            mWeatherView.reset();
+            hideTipsView();
+            return;
+        }
         refreshAfterLocated = false;
         mWeatherView.setSimpleWeatherData(data);
         mMenuLeft.setSimpleDatas(data);
@@ -222,7 +241,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             contentView.addView(mWeatherView);
         }
         hideTipsView();
-        if (ttsOn) {
+        if (ttsOn && !isSilence) {
             ttsControl.speak("天气刷新成功," + data.getSpeakText());
         }
     }
@@ -305,7 +324,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
 
         if (nWeatherManager != null) {
-            nWeatherManager.destory();
+            nWeatherManager.destroy();
         }
 
         if (log2file) {
@@ -316,6 +335,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         }
         if (mLocationClient != null && mLocationClient.isStarted()) {
             mLocationClient.stop();
+        }
+        if (mRingerModeReceiver != null) {
+            unregisterReceiver(mRingerModeReceiver);
         }
     }
 
@@ -389,8 +411,10 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         double longitude = bdLocation.getLongitude();
         String currentCity = bdLocation.getAddress().city;
         android.util.Log.e(TAG, "onReceiveLocation succeed located to :" + currentCity);
-        WeatherApplication.setCurrentCity(currentCity);
         if (currentCity != null && !"".equals(currentCity)) {
+            if (currentCity.endsWith("市") && !currentCity.equals("沙市") && !currentCity.equals("津市")) {
+                currentCity = currentCity.substring(0, currentCity.length() - 1);
+            }
             locatedCity = new City(currentCity, latitude, longitude);
             WeatherApplication.setLocatedCity(locatedCity);
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
@@ -420,4 +444,25 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
                 break;
         }
     }
+
+    private BroadcastReceiver mRingerModeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(AudioManager.RINGER_MODE_CHANGED_ACTION)) {
+                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                final int ringerMode = am.getRingerMode();
+                switch (ringerMode) {
+                    case AudioManager.RINGER_MODE_NORMAL:
+                        isSilence = false;
+                        break;
+                    case AudioManager.RINGER_MODE_VIBRATE:
+                        isSilence = false;
+                        break;
+                    case AudioManager.RINGER_MODE_SILENT:
+                        isSilence = true;
+                        break;
+                }
+            }
+        }
+    };
 }

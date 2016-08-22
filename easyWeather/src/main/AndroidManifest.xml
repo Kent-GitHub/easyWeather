@@ -48,8 +48,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.easynetwork.weather.core.menu.menu_right.LocateActivity" />
-        <activity android:name="com.easynetwork.weather.core.menu.menu_right.ManageCityActivity" />
+        <activity android:name=".core.LocateActivity" />
+        <activity android:name=".core.ManageCityActivity" />
 
         <service
             android:name="com.baidu.location.f"

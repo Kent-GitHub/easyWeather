@@ -2,13 +2,17 @@ package com.easynetwork.weather.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.*;
 
 import com.easynetwork.weather.bean.City;
-import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.bean.SimpleWeatherData;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * SharedPreferences 存储工具类
@@ -63,8 +67,7 @@ public class SharedPreUtil {
         for (City c : cities) {
             if (c.getCity().equals(city.getCity())) {
                 cities.remove(c);
-                cities.add(city);
-                return;
+                break;
             }
         }
         cities.add(city);
@@ -102,23 +105,15 @@ public class SharedPreUtil {
         storage.commit();
     }
 
-    public static void saveWeatherData(Context context, WeatherWrapper data) {
-        if (!data.done) return;
-        SimpleWeatherData simpleData = new SimpleWeatherData(data);
-        SharedPreferences.Editor storage = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE).edit();
-        storage.putString("simpleData", simpleData.getDate());
-        storage.putString("simpleLocation", simpleData.getLocation());
-        storage.putString("simpleCode", simpleData.getRtWeatherCode());
-        storage.putString("simpleDescribe", simpleData.getRtDescribe());
-        storage.putString("simpleDayDescribe", simpleData.getDayDescribe());
-        storage.putString("simpleRTTMP", simpleData.getRtTmp());
-        storage.putString("simpleTMPR", simpleData.getTmpRange());
-        storage.putLong("simpleTimeStamp", simpleData.getTimeStamp());
-        String[] predictions = simpleData.getPrediction();
-        storage.putString("simplePrediction0", predictions[0]);
-        storage.putString("simplePrediction1", predictions[1]);
-        storage.putString("simplePrediction2", predictions[2]);
-        storage.commit();
+    public static void removeCity(Context context, City city) {
+        List<City> cities = getCities(context, "");
+        for (City c : cities) {
+            if (c.getCity().equals(city.getCity())) {
+                cities.remove(c);
+                break;
+            }
+        }
+        setCities(context, cities);
     }
 
     public static void saveSimpleData(Context context, String key, String data) {
@@ -129,27 +124,6 @@ public class SharedPreUtil {
     public static String getSimpleData(Context context, String key) {
         SharedPreferences pref = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE);
         return pref.getString(key, null);
-    }
-
-    public static SimpleWeatherData getWeatherData(Context context) {
-        SharedPreferences storage = context.getSharedPreferences(SimpleData, Context.MODE_PRIVATE);
-        long timeStamp = storage.getLong("simpleTimeStamp", -1);
-        if (timeStamp == -1) return null;
-        SimpleWeatherData date = new SimpleWeatherData();
-        date.setTimeStamp(timeStamp);
-        date.setDate(storage.getString("simpleData", ""));
-        date.setLocation(storage.getString("simpleLocation", ""));
-        date.setRtWeatherCode(storage.getString("simpleCode", ""));
-        date.setRtDescribe(storage.getString("simpleDescribe", ""));
-        date.setDayDescribe(storage.getString("simpleDayDescribe", ""));
-        date.setRtTmp(storage.getString("simpleRTTMP", ""));
-        date.setTmpRange(storage.getString("simpleTMPR", ""));
-        String prediction0 = storage.getString("simplePrediction0", "");
-        String prediction1 = storage.getString("simplePrediction1", "");
-        String prediction2 = storage.getString("simplePrediction2", "");
-        String[] predictions = new String[]{prediction0, prediction1, prediction2};
-        date.setPrediction(predictions);
-        return date;
     }
 
 }

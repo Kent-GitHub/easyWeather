@@ -17,35 +17,11 @@ public class SimpleWeatherData {
     private String dayDescribe;
     private String rtTmp;
     private String tmpRange;
-    private String[] prediction;
-    private long timeStamp;
-
     private List<DailyWeatherData> days = new ArrayList<>();
 
-    public SimpleWeatherData() {
-    }
+    private int resultCode;
 
-    public SimpleWeatherData(WeatherWrapper weatherData) {
-        if (!weatherData.done) {
-            return;
-        }
-        timeStamp = System.currentTimeMillis() / 1000;
-        DailyWeatherData today = weatherData.getToday();
-        NowWeatherData now = weatherData.getNowWeatherData();
-        Date date = new Date();
-        Calendar c = Calendar.getInstance();
-        String dateString = (new SimpleDateFormat("MM.dd").format(date) + "/") +
-                formatWeekday(c.get(Calendar.DAY_OF_WEEK));
-        setDate(dateString);
-        setLocation(weatherData.nUser.city);
-        setRtDescribe(now.txt);
-        setDayDescribe(today.describe);
-        setRtTmp(now.tmp);
-        setTmpRange(today.minTmp + "~" + today.maxTmp + "°C");
-        setRtWeatherCode(now.code);
-        DailyWeatherData tomorrow = weatherData.getTomorrow();
-        DailyWeatherData afterTomorrow = weatherData.getAfterTomorrow();
-        prediction = new String[]{today.getString(), tomorrow.getString(), afterTomorrow.getString()};
+    public SimpleWeatherData() {
     }
 
     public SimpleWeatherData(WeatherBean bean) {
@@ -76,12 +52,12 @@ public class SimpleWeatherData {
         days.add(bean.getDailyDate(2));
     }
 
-    public SimpleWeatherData(JSONObject json) {
-
-    }
-
     public List<DailyWeatherData> getDays() {
         return days;
+    }
+
+    public void setDays(List<DailyWeatherData> days) {
+        this.days = days;
     }
 
     public String getSpeakText() {
@@ -105,6 +81,14 @@ public class SimpleWeatherData {
             return "未知";
         }
         return s;
+    }
+
+    public int getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(int resultCode) {
+        this.resultCode = resultCode;
     }
 
     public String getDayWeatherCode() {
@@ -170,22 +154,6 @@ public class SimpleWeatherData {
 
     public void setTmpRange(String tmpRange) {
         this.tmpRange = tmpRange;
-    }
-
-    public String[] getPrediction() {
-        return prediction;
-    }
-
-    public void setPrediction(String[] prediction) {
-        this.prediction = prediction;
-    }
-
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
     }
 
     private String formatWeekday(int day) {

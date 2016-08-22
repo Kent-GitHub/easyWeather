@@ -1,11 +1,10 @@
-package com.easynetwork.weather.core.menu.menu_right;
+package com.easynetwork.weather.core;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -19,11 +18,12 @@ import android.widget.TextView;
 import com.easynetwork.weather.R;
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
-import com.easynetwork.weather.core.WeatherActivity;
 import com.easynetwork.weather.tools.SharedPreUtil;
 import com.easynetwork.weather.tools.StatusBarUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,11 +51,16 @@ public class ManageCityActivity extends Activity implements View.OnClickListener
     private static final String TAG = "ManageCityActivityMYMY";
 
     private void initDatas() {
-        String city = WeatherApplication.getCurrentCity();
+        City city = WeatherApplication.getLocatedCity();
+        String nCity = "未知";
+        if (city != null) {
+            nCity = city.getCity();
+        }
         mDatas = new ArrayList<>();
-        mDatas.add(new City("当前城市(" + city + ")"));
         List<City> cities = SharedPreUtil.getCities(this, "");
         mDatas.addAll(cities);
+        Collections.reverse(mDatas);
+        mDatas.add(0, new City("当前城市(" + nCity + ")"));
         mAdapter = new MyAdapter();
         mCityList.setAdapter(mAdapter);
         mCityList.setOnItemClickListener(this);

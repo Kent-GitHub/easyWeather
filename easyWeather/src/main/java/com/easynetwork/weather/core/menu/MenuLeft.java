@@ -1,4 +1,4 @@
-package com.easynetwork.weather.core.menu.menu_left;
+package com.easynetwork.weather.core.menu;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.easynetwork.weather.bean.DailyWeatherData;
 import com.easynetwork.weather.bean.SimpleWeatherData;
-import com.easynetwork.weather.bean.WeatherWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,17 +91,6 @@ public class MenuLeft extends LinearLayout {
         }
     }
 
-    public void setDatas(WeatherWrapper data) {
-        mDatas.clear();
-        data.getToday().date = "今天";
-        data.getTomorrow().date = "明天";
-        data.getAfterTomorrow().date = "后天";
-        mDatas.add(data.getToday());
-        mDatas.add(data.getTomorrow());
-        mDatas.add(data.getAfterTomorrow());
-        mAdapter.notifyDataSetChanged();
-    }
-
     public void setSimpleDatas(SimpleWeatherData data) {
         mDatas.clear();
         data.getDays().get(0).date = "今天";
@@ -114,16 +102,4 @@ public class MenuLeft extends LinearLayout {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void setDatas(SimpleWeatherData data) {
-        if (mDatas == null) return;
-        mDatas.clear();
-        String[] predictions = data.getPrediction();
-        DailyWeatherData today = new DailyWeatherData(predictions[0]);
-        DailyWeatherData tomorrow = new DailyWeatherData(predictions[1]);
-        DailyWeatherData afterTomorrow = new DailyWeatherData(predictions[2]);
-        mDatas.add(today);
-        mDatas.add(tomorrow);
-        mDatas.add(afterTomorrow);
-        mAdapter.notifyDataSetChanged();
-    }
 }

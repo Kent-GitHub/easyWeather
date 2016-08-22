@@ -1,6 +1,7 @@
 package com.easynetwork.weather.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,18 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.easynetwork.weather.bean.WeatherWrapper;
 import com.easynetwork.weather.core.WeatherActivity;
-import com.easynetwork.weather.core.menu.menu_right.CodeToValues;
-import com.easynetwork.weather.tools.ToastUtil;
+import com.easynetwork.weather.core.CodeToValues;
 import com.easynetwork.weather.R;
-import com.easynetwork.weather.bean.DailyWeatherData;
-import com.easynetwork.weather.bean.NowWeatherData;
 import com.easynetwork.weather.bean.SimpleWeatherData;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class SimpleWeatherView extends LinearLayout {
     /**
@@ -73,66 +66,17 @@ public class SimpleWeatherView extends LinearLayout {
 
     private void init() {
         date = (TextView) findViewById(R.id.title_date);
-        date.setTextSize(24);
         location = (TextView) findViewById(R.id.title_location);
-        location.setTextSize(24);
         RTTmp = (TextView) findViewById(R.id.rt_tmp);
         TextPaint paint = RTTmp.getPaint();
         paint.setFakeBoldText(true);
         RTTvDescribe = (TextView) findViewById(R.id.tv_weather_describe);
-        RTTvDescribe.setTextSize(24);
         tmpRange = (TextView) findViewById(R.id.tv_tmp_range);
-        tmpRange.setTextSize(24);
         ivDescribe = (ImageView) findViewById(R.id.rt_describe);
         icon = (ImageView) findViewById(R.id.iv_weather_icon);
     }
 
     private static final String TAG = "SimpleWeatherViewMYMY";
-
-    public void setWeatherData(WeatherWrapper weatherData) {
-        if (!weatherData.done) {
-            ToastUtil.showText(mContext, "天气数据加载失败。。。");
-            return;
-        }
-        String location = weatherData.nUser.city;
-        DailyWeatherData today = weatherData.getToday();
-        NowWeatherData now = weatherData.getNowWeatherData();
-        Date date = new Date();
-        Calendar c = Calendar.getInstance();
-        StringBuilder dateString = new StringBuilder();
-        dateString.append(new SimpleDateFormat("MM.dd").format(date) + "/");
-        dateString.append(formatWeekday(c.get(Calendar.DAY_OF_WEEK)));
-        if (this.date != null) {
-            this.date.setText(dateString.toString());
-        }
-        if (this.location != null) {
-            this.location.setText(location);
-        }
-        if (RTTvDescribe != null) {
-            RTTvDescribe.setText(now.txt);
-        }
-        if (RTTmp != null) {
-            RTTmp.setText(now.tmp);
-        }
-        if (tmpRange != null) {
-            tmpRange.setText(today.minTmp + "~" + today.maxTmp + "°C");
-        }
-        try {
-            if (ivDescribe != null) {
-                ivDescribe.setImageResource(CodeToValues.getImageDescribe(Integer.parseInt(now.code)));
-            }
-            if (icon != null) {
-                icon.setImageResource(CodeToValues.getIconDescribe(Integer.parseInt(now.code)));
-            }
-            setBackgroundColor(CodeToValues.getColorByCode(Integer.parseInt(now.code)));
-            if (mContext instanceof WeatherActivity) {
-                ((WeatherActivity) mContext).setStatusBarColor(CodeToValues.getColorByCode(Integer.parseInt(now.code)));
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "setWeatherData: weatherCodeError");
-        }
-
-    }
 
     public void setWeatherData(SimpleWeatherData data) {
         if (this.date != null) {
@@ -165,6 +109,28 @@ public class SimpleWeatherView extends LinearLayout {
         } catch (Exception e) {
             Log.e(TAG, "setWeatherData: weatherCodeError");
         }
+    }
+
+    public void reset() {
+        if (this.location != null) {
+            this.location.setText("未知");
+        }
+        if (RTTvDescribe != null) {
+            RTTvDescribe.setText("未知");
+        }
+        if (RTTmp != null) {
+            RTTmp.setText("未知");
+        }
+        if (tmpRange != null) {
+            tmpRange.setText("未知");
+        }
+        if (ivDescribe != null) {
+            ivDescribe.setImageResource(R.drawable.dcr_weather_na);
+        }
+        if (icon != null) {
+            icon.setImageResource(R.drawable.icon_na);
+        }
+        setBackgroundColor(Color.parseColor("#2684e4"));
     }
 
     private String formatWeekday(int day) {
