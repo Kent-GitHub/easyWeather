@@ -13,6 +13,7 @@ import com.easynetwork.weather.bean.WeatherBean;
 import com.easynetwork.weather.tools.Log;
 import com.easynetwork.weather.tools.SharedPreUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -133,7 +134,13 @@ public class WeatherManager {
 
 
         Gson gson = new Gson();
-        WeatherBean bean = gson.fromJson(jsonResult, WeatherBean.class);
+        WeatherBean bean;
+        try {
+            bean = gson.fromJson(jsonResult, WeatherBean.class);
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
 
         if (!bean.getErrNum().equals("200")) {
             android.util.Log.e(TAG, "getSimpleWeatherData_ErrNum(): " + bean.getErrNum());
@@ -142,7 +149,12 @@ public class WeatherManager {
         if (city != null) {
             bean.setCity(city);
         }
-        String jsonString = gson.toJson(bean);
+        String jsonString;
+
+        jsonString = gson.toJson(bean);
+
+        data = new SimpleWeatherData(bean);
+        data.setResultCode(resultCode);
         String stamp = System.currentTimeMillis() / 1000 + "";
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_JSON, jsonString);
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_LATITUDE, latitude);
@@ -150,8 +162,6 @@ public class WeatherManager {
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_STAMP, stamp);
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_CITY, city);
         android.util.Log.e(TAG, "getSimpleWeatherData: saved");
-        data = new SimpleWeatherData(bean);
-        data.setResultCode(resultCode);
         return data;
     }
 
