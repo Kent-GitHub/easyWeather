@@ -114,7 +114,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         //初始化&监听情景模式
         AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int ringerMode = audio.getRingerMode();
-        if (ringerMode == AudioManager.RINGER_MODE_SILENT) isSilence = true;
+        if (ringerMode == AudioManager.RINGER_MODE_SILENT || ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
+            isSilence = true;
+        }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
         registerReceiver(mRingerModeReceiver, intentFilter);
@@ -149,7 +151,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         long timeStamp;
         double latitude;
         double longitude;
-        String json ;
+        String json;
         City currentCity;
         try {
             city = SharedPreUtil.getSimpleData(WeatherApplication.context, Constants.SD_CITY);
@@ -456,7 +458,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
                         isSilence = false;
                         break;
                     case AudioManager.RINGER_MODE_VIBRATE:
-                        isSilence = false;
+                        isSilence = true;
                         break;
                     case AudioManager.RINGER_MODE_SILENT:
                         isSilence = true;
