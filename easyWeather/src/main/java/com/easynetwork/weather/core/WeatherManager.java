@@ -5,19 +5,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
 import com.easynetwork.weather.bean.SimpleWeatherData;
 import com.easynetwork.weather.bean.WeatherBean;
+import com.easynetwork.weather.bean.WeatherCache;
 import com.easynetwork.weather.tools.Log;
 import com.easynetwork.weather.tools.SharedPreUtil;
+import com.easynetwork.weather.provider.WeatherCacheHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * 单例模式<br>
@@ -107,7 +112,8 @@ public class WeatherManager {
 
         @Override
         protected void onPostExecute(SimpleWeatherData simpleWeatherData) {
-            nDataLoadListener.onWeatherDataLoaded(simpleWeatherData);
+            EventBus.getDefault().post(simpleWeatherData);
+//            nDataLoadListener.onWeatherDataLoaded(simpleWeatherData);
         }
     }
 
@@ -115,7 +121,6 @@ public class WeatherManager {
         SimpleWeatherData data;
         long time = System.currentTimeMillis() / 1000;
         String jsonResult;
-        // TODO: 2016/8/16 更换查询接口
         String httpUrl;
         if (useURL1) {
             httpUrl = Constants.WEATHER_DATA_URL1 + "&w=" + latitude + "&j=" + longitude + "&t=" + time;
@@ -162,6 +167,21 @@ public class WeatherManager {
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_STAMP, stamp);
         SharedPreUtil.saveSimpleData(WeatherApplication.context, Constants.SD_CITY, city);
         android.util.Log.e(TAG, "getSimpleWeatherData: saved");
+        WeatherCache cache = new WeatherCache();
+        cache.setId(1);
+        cache.setCity(bean.getCity());
+        cache.setLatitude(Double.parseDouble(latitude));
+        cache.setLongitude(Double.parseDouble(longitude));
+        cache.setDate(bean.getData().getBasic().getUpdate().substring(0, 10));
+        cache.setMinTmp(bean.getData().getDaily_forecast().get(0).getTmp().getMin());
+        cache.setMaxTmp(bean.getData().getDaily_forecast().get(0).getTmp().getMax());
+        cache.setRtTmp(bean.getData().getNow().getTmp());
+        cache.setDescribe(bean.getData().getDaily_forecast().get(0).getCond().getAbstractX());
+        try {
+            WeatherCacheHelper.getHelper(mContext).getWeatherDao().createOrUpdate(cache);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return data;
     }
 

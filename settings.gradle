@@ -1,1 +1,4 @@
 include ':easyWeather', ':slidemenu'
+include ':AdProject'
+project (':AdProject').projectDir = new File('../AdProject/')
+include ':AdProject:AdUtils'

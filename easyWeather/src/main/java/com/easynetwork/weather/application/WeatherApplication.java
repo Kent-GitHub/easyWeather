@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+//import com.easynetwork.ad.manager.AdManager;
 import com.easynetwork.weather.bean.City;
 
 public class WeatherApplication extends Application {
@@ -42,7 +43,6 @@ public class WeatherApplication extends Application {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale);
     }
-
 
 
     public static City getCurrentCity() {

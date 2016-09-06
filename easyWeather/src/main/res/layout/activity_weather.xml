@@ -1,6 +1,5 @@
 <me.tangke.slidemenu.SlideMenu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:slidemenudemo="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/slideMenu"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,16 +7,14 @@
     slidemenudemo:secondaryShadowWidth="3dp"
     slidemenudemo:slideDirection="left|right">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/weather_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#2684e4"
         android:orientation="vertical"
-        slidemenudemo:layout_role="content"
-        tools:context="${relativePackage}.${activityClass}">
-
+        android:focusable="false"
+        slidemenudemo:layout_role="content">
 
 
         <RelativeLayout
@@ -32,6 +29,6 @@
 
         </RelativeLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </me.tangke.slidemenu.SlideMenu>

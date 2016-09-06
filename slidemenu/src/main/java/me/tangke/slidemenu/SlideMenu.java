@@ -397,7 +397,6 @@ public class SlideMenu extends ViewGroup {
      *
      * @param slideMode
      */
-    // TODO: mark changeToPrivate cause this method lead to error
     private void setSlideMode(int slideMode) {
         if (isAttacthedInContentView()) {
             throw new IllegalStateException(

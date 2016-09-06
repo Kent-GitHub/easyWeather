@@ -54,4 +54,12 @@ public class City implements Serializable {
         longitude = Double.valueOf(values[2]);
     }
 
+    @Override
+    public String toString() {
+        return "City{" +
+                "city='" + city + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }

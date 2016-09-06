@@ -116,7 +116,6 @@ public class ScrollDetectors {
 
 		@Override
 		public boolean canScrollVertical(View v, int direction) {
-			// TODO
 			return false;
 		}
 
@@ -163,7 +162,6 @@ public class ScrollDetectors {
 
 		@Override
 		public boolean canScrollVertical(View v, int direction) {
-			// TODO
 			return false;
 		}
 
@@ -196,7 +194,6 @@ public class ScrollDetectors {
 
 		@Override
 		public boolean canScrollVertical(View v, int direction) {
-			// TODO
 			return false;
 		}
 	}

@@ -34,12 +34,22 @@
     <ListView
         android:id="@+id/manage_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:divider="@drawable/list_divider"
         android:dividerHeight="1px"
         android:listSelector="@drawable/tmp">
 
     </ListView>
 
+    <RelativeLayout
+        android:id="@+id/banner_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tmp"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp">
+
+    </RelativeLayout>
 
 </LinearLayout>

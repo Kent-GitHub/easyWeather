@@ -6,7 +6,6 @@ package com.easynetwork.weather.core;
  * @author WenYF
  */
 public class Constants {
-    // TODO: 2016/8/16 更换查询接口
     public static final String WEATHER_DATA_URL = "http://mobile.pingyijinren.com/weather/weather/index?v=1.0";
     public static final String WEATHER_DATA_URL1 = "http://192.168.10.222/weather/weather/index?v=1.0";
     public static final String FAMILY_LIST_URL = "http://mobile.pingyijinren.com/weather/childweather?";

@@ -27,12 +27,10 @@ public class TextSpeakControl {
     private String speakStr = "";
 
     public TextSpeakControl(final Context context) {
-        // TODO Auto-generated constructor stub
         this.context = context;
         tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                // TODO Auto-generated method stub
                 if (status == TextToSpeech.SUCCESS) {
                     ttsReady = true;
                     int result = tts.setLanguage(Locale.CHINA);

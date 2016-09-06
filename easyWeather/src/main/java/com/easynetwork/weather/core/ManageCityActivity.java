@@ -15,6 +15,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+//import com.easynetwork.ad.bean.AdPlatform;
+//import com.easynetwork.ad.bean.AdListener;
+//import com.easynetwork.ad.manager.AdBannerManager;
 import com.easynetwork.weather.R;
 import com.easynetwork.weather.application.WeatherApplication;
 import com.easynetwork.weather.bean.City;
@@ -22,13 +25,9 @@ import com.easynetwork.weather.tools.SharedPreUtil;
 import com.easynetwork.weather.tools.StatusBarUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by yanming on 2016/8/15.
- */
 public class ManageCityActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private ListView mCityList;
@@ -44,11 +43,18 @@ public class ManageCityActivity extends Activity implements View.OnClickListener
         findViewById(R.id.add_city).setOnClickListener(this);
         StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#e96e13"));
         mCityList = (ListView) findViewById(R.id.manage_list);
-        TextView mngCity = (TextView) findViewById(R.id.tv_mng_city);
+//        ViewGroup bannerC = (ViewGroup) findViewById(R.id.banner_container);
+//        bannerC.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AdBannerManager.getInstance().performAdClick("manageBanner");
+//            }
+//        });
+//        AdBannerManager.getInstance().setScaleFix(true).request(this, bannerC, "manageBanner", this);
         initDatas();
     }
 
-    private static final String TAG = "ManageCityActivityMYMY";
+    private static final String TAG = "ManageCityActivity";
 
     private void initDatas() {
         City city = WeatherApplication.getLocatedCity();
@@ -94,6 +100,36 @@ public class ManageCityActivity extends Activity implements View.OnClickListener
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
         return false;
     }
+
+//    @Override
+//    public void onAdClick(AdPlatform adPlatform, String s) {
+//
+//    }
+//
+//    @Override
+//    public void onAdDisplay(AdPlatform adPlatform, String s) {
+//
+//    }
+//
+//    @Override
+//    public void onAdFailed(AdPlatform adPlatform, String s) {
+//
+//    }
+//
+//    @Override
+//    public void onAdReady(AdPlatform adPlatform, String s) {
+//
+//    }
+//
+//    @Override
+//    public void onAdDismiss(AdPlatform adPlatform, String s) {
+//
+//    }
+//
+//    @Override
+//    public void onLeftApplication(AdPlatform adPlatform, String s) {
+//
+//    }
 
 
     private class MyAdapter extends BaseAdapter {

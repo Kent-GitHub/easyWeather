@@ -58,6 +58,7 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         if (mContext instanceof WeatherActivity) {
             ((WeatherActivity) mContext).setTtsOn(ttsOn);
         }
+        setFocusable(true);
         initDatas();
     }
 
@@ -163,10 +164,6 @@ public class MenuRight extends LinearLayout implements AdapterView.OnItemClickLi
         if (mListView == null) return;
         title.setFocusable(true);
         title.requestFocus();
-
-        mListView.getChildAt(0).setSelected(true);
-        mListView.getChildAt(0).requestFocus();
-
     }
 
     @Override

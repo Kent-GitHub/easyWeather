@@ -4,6 +4,13 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+//import com.easynetwork.ad.bean.AdPlatform;
+//import com.easynetwork.ad.manager.AdBannerManager;
+//import com.easynetwork.ad.manager.AdInstlManager;
+//import com.easynetwork.ad.manager.AdManager;
+//import com.easynetwork.ad.manager.AdSplashManager;
+//import com.easynetwork.ad.bean.AdListener;
+import com.easynetwork.weather.provider.WeatherService;
 import com.easynetwork.weather.tools.Log;
 import com.easynetwork.weather.tools.network.NetworkUtil;
 import com.easynetwork.weather.application.WeatherApplication;
@@ -22,6 +29,7 @@ import com.easynetwork.weather.view.SimpleWeatherView;
 import com.easynetwork.weather.R;
 
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,10 +37,16 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import me.tangke.slidemenu.SlideMenu;
 
@@ -48,7 +62,7 @@ import me.tangke.slidemenu.SlideMenu;
  * @author WenYF
  */
 public class WeatherActivity extends Activity implements WeatherManager.DataLoadListener,
-        SlideMenu.OnSlideStateChangeListener, BDLocationListener, View.OnClickListener {
+        SlideMenu.OnSlideStateChangeListener, View.OnClickListener {
 
     private final static String TAG = "WeatherActivity";
     private final static boolean log2file = true;
@@ -56,9 +70,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     private final static int Status_Right = 0x102;
     private final static int Status_Normal = 0x103;
     private int layoutStatus = Status_Normal;
-
-
-    public LocationClient mLocationClient = null;
 
     /**
      * 天气数据下载等管理器
@@ -101,6 +112,23 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         mWeatherView = (SimpleWeatherView) findViewById(R.id.simple_weather);
         findViewById(R.id.title_LBtn).setOnClickListener(this);
         findViewById(R.id.btn_RBtn).setOnClickListener(this);
+        //ad
+//        AdManager.setLogOut(true);
+//        // TODO: 2016/9/3 testMode
+//        AdManager.isTestMode(true);
+//        AdManager.initSdk(this);
+//        AdManager.setGDTKey("1105590265", "9030818499211961", "5080612419518952", "5040517469715923");
+        //开屏广告
+//        ViewGroup viewGroup = (ViewGroup) findViewById(R.id.weather_container_view);
+//        AdSplashManager.getInstance().request(this, viewGroup, this);
+
+        //弹窗广告
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                AdInstlManager.getInstance().request(WeatherActivity.this, WeatherActivity.this);
+//            }
+//        }, 10 * 1000);
 
         //初始化SlideMenu
         mSlideMenu = (SlideMenu) findViewById(R.id.slideMenu);
@@ -111,6 +139,9 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         mSlideMenu.addView(mMenuRight, new SlideMenu.LayoutParams((int) (WeatherApplication.getScreenWidth() * 0.8),
                 SlideMenu.LayoutParams.MATCH_PARENT, SlideMenu.LayoutParams.ROLE_SECONDARY_MENU));
         mSlideMenu.setOnSlideStateChangeListener(this);
+
+
+//        AdBannerManager.getInstance().request(this,viewGroup, this);
         //初始化&监听情景模式
         AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int ringerMode = audio.getRingerMode();
@@ -128,14 +159,12 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
 
         //加载本地数据或请求网络数据
         initWeather();
-
-        //初始化定位
-        mLocationClient = new LocationClient(getApplicationContext());
-        initLocation();
-        mLocationClient.registerLocationListener(this);
-        mLocationClient.start();
-
+        LocationManager.getInstance(this).initLocation();
+        EventBus.getDefault().register(this);
+        Intent serviceIntent = new Intent(this, WeatherService.class);
+        startService(serviceIntent);
     }
+
 
     /**
      * 定位成功后按定位地点进行刷新
@@ -202,23 +231,6 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         android.util.Log.e(TAG, "request weather ,it's located already.");
     }
 
-    private void initLocation() {
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
-        );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
-        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
-        int span = 0;
-        option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
-        option.setOpenGps(false);//可选，默认false,设置是否使用gps
-        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
-        option.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
-        option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
-        option.setIgnoreKillProcess(false);//可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
-        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
-        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
-        mLocationClient.setLocOption(option);
-    }
 
     private RelativeLayout contentView;
 
@@ -248,6 +260,26 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         }
     }
 
+    @Subscribe
+    public void onWeatherLoaded(SimpleWeatherData data) {
+        if (data == null || mWeatherView == null) {
+            Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
+            mWeatherView.reset();
+            hideTipsView();
+            return;
+        }
+        refreshAfterLocated = false;
+        mWeatherView.setSimpleWeatherData(data);
+        mMenuLeft.setSimpleDatas(data);
+        if (mWeatherView.getParent() == null) {
+            contentView.removeAllViews();
+            contentView.addView(mWeatherView);
+        }
+        hideTipsView();
+        if (ttsOn && !isSilence) {
+            ttsControl.speak("天气刷新成功," + data.getSpeakText());
+        }
+    }
 
     private void showTipsView() {
         StatusBarUtils.setWindowStatusBarColor(this, Color.parseColor("#2684e4"));
@@ -323,7 +355,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        EventBus.getDefault().unregister(this);
 
         if (nWeatherManager != null) {
             nWeatherManager.destroy();
@@ -335,9 +367,7 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         if (ttsControl != null) {
             ttsControl.closeTts();
         }
-        if (mLocationClient != null && mLocationClient.isStarted()) {
-            mLocationClient.stop();
-        }
+
         if (mRingerModeReceiver != null) {
             unregisterReceiver(mRingerModeReceiver);
         }
@@ -380,6 +410,11 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
         } else if (keyCode == KeyEvent.KEYCODE_BACK && ttsControl != null && ttsControl.isSpeak()) {
             ttsControl.stopSpeak();
         }
+//        else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && AdSplashManager.getInstance().isSplashShowing()) {
+//            AdSplashManager.getInstance().performAdClick();
+//        } else if (keyCode == KeyEvent.KEYCODE_BACK && AdSplashManager.getInstance().isSplashShowing()) {
+//            return !super.onKeyDown(keyCode, event);
+//        }
         return super.onKeyDown(keyCode, event);
     }
 
@@ -395,34 +430,26 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
      */
     private boolean isLocated = false;
 
-    @Override
-    public void onReceiveLocation(BDLocation bdLocation) {
-        int locType = bdLocation.getLocType();
-        //定位失败处理
-        if (locType != 61 && locType != 66 && locType != 161) {
-            android.util.Log.e(TAG, "onReceiveLocation: local failed with code:" + locType);
+    /**
+     * 定位后回调
+     *
+     * @param city 定位城市
+     */
+    @Subscribe
+    public void onLocated(City city) {
+        android.util.Log.e(TAG, "onLocated: in WeatherActivity");
+        locatedCity = city;
+        if (city.getCity() == null) {
             ToastUtil.showText(this, "定位失败");
             if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
                 hideTipsView();
             }
             return;
         }
-        //定位成功处理
         isLocated = true;
-        double latitude = bdLocation.getLatitude();
-        double longitude = bdLocation.getLongitude();
-        String currentCity = bdLocation.getAddress().city;
-        android.util.Log.e(TAG, "onReceiveLocation succeed located to :" + currentCity);
-        if (currentCity != null && !"".equals(currentCity)) {
-            if (currentCity.endsWith("市") && !currentCity.equals("沙市") && !currentCity.equals("津市")) {
-                currentCity = currentCity.substring(0, currentCity.length() - 1);
-            }
-            locatedCity = new City(currentCity, latitude, longitude);
-            WeatherApplication.setLocatedCity(locatedCity);
-            if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
-                nWeatherManager.requestData(locatedCity);
-                android.util.Log.e(TAG, "located already,request weather date now.");
-            }
+        if (refreshAfterLocated && NetworkUtil.isNetworkAvailable(this)) {
+            nWeatherManager.requestData(locatedCity);
+            android.util.Log.e(TAG, "located already,request weather date now.");
         }
     }
 
@@ -467,4 +494,34 @@ public class WeatherActivity extends Activity implements WeatherManager.DataLoad
             }
         }
     };
+
+//    @Override
+//    public void onAdClick(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onAdClick: " + s);
+//    }
+//
+//    @Override
+//    public void onAdDisplay(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onAdDisplay: " + s);
+//    }
+//
+//    @Override
+//    public void onAdFailed(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onAdFailed: " + s);
+//    }
+//
+//    @Override
+//    public void onAdReady(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onAdReady: " + s);
+//    }
+//
+//    @Override
+//    public void onAdDismiss(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onAdDismiss: " + s);
+//    }
+//
+//    @Override
+//    public void onLeftApplication(AdPlatform adPlatform, String s) {
+//        android.util.Log.e(TAG, "onLeftApplication: " + s);
+//    }
 }
